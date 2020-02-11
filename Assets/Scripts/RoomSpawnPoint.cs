@@ -14,7 +14,7 @@ public class RoomSpawnPoint : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Invoke("SpawnRoom", 0.1f);
+        Invoke("SpawnRoom", Random.Range(0.5f, 1.5f));
     }
 
     public void SpawnRoom()
@@ -34,6 +34,7 @@ public class RoomSpawnPoint : MonoBehaviour
                 Instantiate(LeftRooms[Random.Range(0, LeftRooms.Count)], transform.position, Quaternion.identity);
                 break;
             default:
+                Debug.LogWarning("ParentDirection set to a wrong value");
                 break;
         }
     }
@@ -44,4 +45,13 @@ public class RoomSpawnPoint : MonoBehaviour
     }
 
     enum Direction { Bottom, Top, Right, Left };
+
+    private void OnTriggerStay2D(Collider2D collision)
+    {
+        Debug.Log("collision");
+        if (collision.tag == "Room")
+        {
+            Destroy(gameObject);
+        }
+    }
 }
