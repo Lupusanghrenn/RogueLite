@@ -10,8 +10,9 @@ GameObject:
   m_Component:
   - component: {fileID: 4326368437203928478}
   - component: {fileID: 4326368437203928479}
+  - component: {fileID: -4636342508112495555}
   m_Layer: 0
-  m_Name: SpawnPoint bot
+  m_Name: SpawnPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -74,3 +75,19 @@ MonoBehaviour:
   - {fileID: 4842051132221848491, guid: 089cffe4590b1eb4c8d99c7a851809d2, type: 3}
   - {fileID: 4691864689956917287, guid: 3ff97bdee2d8b764f9ed8bb562c8bdc3, type: 3}
   - {fileID: 6400177359124549584, guid: a5e5c91edbeaf9f46a5ff0179aa51e7a, type: 3}
+--- !u!58 &-4636342508112495555
+CircleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4326368437203928477}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  serializedVersion: 2
+  m_Radius: 0.5
