@@ -25,15 +25,16 @@ public class LevelGenerator : MonoBehaviour
         List<LayoutRoom> spawnedRooms = new List<LayoutRoom>();
 
         //First Room
-        LayoutRoom firstRoom = new LayoutRoom(Vector2.zero, Vector2.zero);
+        LayoutRoom firstRoom = new LayoutRoom(Vector2.zero, Vector2.zero, 0, 0);
         spawnedRooms.Add(firstRoom);
         nbSpawnedRoom++;
+        Instantiate(Resources.Load("DebugCircle"), firstRoom.Position, Quaternion.identity);
 
         while (nbSpawnedRoom < nbRoom)
         {
             RepaintWhiteCircle();
             //Chose the room to expend from
-            LayoutRoom chosenRoom = ChooseChosenRoom(spawnedRooms);
+            LayoutRoom chosenRoom = ChoseRoom1Neighbor(spawnedRooms);
 
             //Expend
             float branchOutRdm = Random.Range(0.0f, 1.0f);
@@ -56,6 +57,36 @@ public class LevelGenerator : MonoBehaviour
                 SpawnForwardRoom(chosenRoom.Position, spawnedRooms);
             }
         }
+
+        ChoseBossRoom(spawnedRooms);
+    }
+
+    /// <summary>
+    /// choses the furthest room from the spawn to be the boss room
+    /// </summary>
+    /// <param name="spawnedRooms"></param>
+    public void ChoseBossRoom(List<LayoutRoom> spawnedRooms)
+    {
+        LayoutRoom bossRoom = FindFurthestRoom(spawnedRooms);
+        bossRoom.RoomType = 1;
+        GameObject redCircle = (GameObject)Instantiate(Resources.Load("DebugCircle"), bossRoom.Position, Quaternion.identity); ;
+        redCircle.GetComponent<SpriteRenderer>().color = Color.red;
+    }
+
+    public LayoutRoom FindFurthestRoom(List<LayoutRoom> spawnedRooms)
+    {
+        int index = -1;
+        float distance = 0;
+        for (int i = 0; i < spawnedRooms.Count; i++)
+        {
+            if (index == -1 || spawnedRooms[i].Position.magnitude > distance)
+            {
+                distance = spawnedRooms[i].Position.magnitude;
+                index = i;
+            }
+        }
+
+        return spawnedRooms[index];
     }
 
     public void SpawnForwardRoom(Vector2 currentPos, List<LayoutRoom> spawnedRooms)
@@ -63,7 +94,7 @@ public class LevelGenerator : MonoBehaviour
         LayoutRoom currentRoom = spawnedRooms.Find(r => r.Position == currentPos);
         Vector2 newRoomPos = currentRoom.Position + currentRoom.Forward;
 
-        LayoutRoom newRoom = new LayoutRoom(newRoomPos, currentRoom.Forward);
+        LayoutRoom newRoom = new LayoutRoom(newRoomPos, currentRoom.Forward, 0, currentRoom.DistanceFromSpawn + 1);
 
         if (spawnedRooms.FindIndex(r => r.Position == newRoomPos) == -1)
         {
@@ -89,7 +120,7 @@ public class LevelGenerator : MonoBehaviour
 
             if (newRoomPos == currentPos + Vector2.up)
             {
-                LayoutRoom newRoom = new LayoutRoom(newRoomPos, Vector2.up);
+                LayoutRoom newRoom = new LayoutRoom(newRoomPos, Vector2.up, 0, currentRoom.DistanceFromSpawn + 1);
                 spawnedRooms.Add(newRoom);
                 UpdateNeighborsSlots(newRoom, spawnedRooms);
                 nbSpawnedRoom++;
@@ -98,7 +129,7 @@ public class LevelGenerator : MonoBehaviour
             }
             else if (newRoomPos == currentPos + Vector2.right)
             {
-                LayoutRoom newRoom = new LayoutRoom(newRoomPos, Vector2.right);
+                LayoutRoom newRoom = new LayoutRoom(newRoomPos, Vector2.right, 0, currentRoom.DistanceFromSpawn + 1);
                 spawnedRooms.Add(newRoom);
                 UpdateNeighborsSlots(newRoom, spawnedRooms);
                 nbSpawnedRoom++;
@@ -107,7 +138,7 @@ public class LevelGenerator : MonoBehaviour
             }
             else if (newRoomPos == currentPos + Vector2.down)
             {
-                LayoutRoom newRoom = new LayoutRoom(newRoomPos, Vector2.down);
+                LayoutRoom newRoom = new LayoutRoom(newRoomPos, Vector2.down, 0, currentRoom.DistanceFromSpawn + 1);
                 spawnedRooms.Add(newRoom);
                 UpdateNeighborsSlots(newRoom, spawnedRooms);
                 nbSpawnedRoom++;
@@ -116,7 +147,7 @@ public class LevelGenerator : MonoBehaviour
             }
             else if (newRoomPos == currentPos + Vector2.left)
             {
-                LayoutRoom newRoom = new LayoutRoom(newRoomPos, Vector2.left);
+                LayoutRoom newRoom = new LayoutRoom(newRoomPos, Vector2.left, 0, currentRoom.DistanceFromSpawn + 1);
                 spawnedRooms.Add(newRoom);
                 UpdateNeighborsSlots(newRoom, spawnedRooms);
                 nbSpawnedRoom++;
@@ -132,13 +163,30 @@ public class LevelGenerator : MonoBehaviour
     /// </summary>
     /// <param name="spawnedRooms"></param>
     /// <returns></returns>
-    public LayoutRoom ChooseChosenRoom(List<LayoutRoom> spawnedRooms)
+    public LayoutRoom ChoseValidRoom(List<LayoutRoom> spawnedRooms)
     {
         int rdm = Random.Range(0, spawnedRooms.Count);
 
         LayoutRoom chosenRoom = spawnedRooms[rdm];
 
         while (chosenRoom.isSurrounded())
+        {
+            rdm = Random.Range(0, spawnedRooms.Count);
+            chosenRoom = spawnedRooms[rdm];
+        }
+
+        return chosenRoom;
+    }
+
+    /// <summary>
+    /// Pick a room in the list of already spawned rooms that has only 1 neighbor
+    public LayoutRoom ChoseRoom1Neighbor(List<LayoutRoom> spawnedRooms)
+    {
+        int rdm = Random.Range(0, spawnedRooms.Count);
+
+        LayoutRoom chosenRoom = spawnedRooms[rdm];
+
+        while (chosenRoom.NbNeighbors() != 1 && chosenRoom.isSurrounded())
         {
             rdm = Random.Range(0, spawnedRooms.Count);
             chosenRoom = spawnedRooms[rdm];
