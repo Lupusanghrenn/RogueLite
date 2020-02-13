@@ -7,40 +7,29 @@ using UnityEngine;
 /// </summary>
 public class LayoutRoom
 {
-    /// <summary>
-    /// 2D pos of the room
-    /// </summary>
-    private Vector2 pos;
-
-    /// <summary>
-    /// represents the neighbors around the Room. true means there is a neighbor, false means empty. Starts at noon and goes clockwise.
-    /// </summary>
-    private bool[] neighborSlots;
+    private Vector2 position; //Grid position of trhe room (not world position)
+    private bool[] neighborSlots; //True is there is a neighbor, false otherwise. Starts at 12h and goes clockwise.
+    private Vector2 forward; //If we consider "backward' as the direction the room has been spawned from. forward is the opposite
 
     #region constructors
-    public LayoutRoom()
+    public LayoutRoom(Vector2 pos, Vector2 forward)
     {
-        pos = Vector2.zero;
-        neighborSlots = new bool[] { false, false, false, false};
-    }
-    
-    public LayoutRoom(Vector2 p)
-    {
-        pos = p;
+        position = pos;
+        this.forward = forward;
         neighborSlots = new bool[] { false, false, false, false };
-    }
-
-    public LayoutRoom(Vector2 p, bool[] b)
-    {
-        pos = p;
-        neighborSlots = b;
     }
     #endregion
 
     #region getter setters
-    public Vector2 Pos
+    public Vector2 Position
     {
-        get { return pos; }
+        get { return position; }
+    }
+
+    public Vector2 Forward
+    {
+        get { return forward; }
+        set { forward = value; }
     }
 
     public bool[] NeighborSlots
@@ -53,7 +42,7 @@ public class LayoutRoom
     #region Methods
     public bool Equals(LayoutRoom r2)
     {
-        return this.pos == r2.pos;
+        return this.position == r2.position;
     }
 
     public bool isSurrounded()

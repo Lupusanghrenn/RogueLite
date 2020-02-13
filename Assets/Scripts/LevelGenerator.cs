@@ -8,6 +8,10 @@ public class LevelGenerator : MonoBehaviour
 {
     [Header("Layout")]
     public int nbRoom;
+    [Range(0.0f, 1.0f)]
+    public float branchOutProbability;
+
+    private int nbSpawnedRoom;
 
     #region Layout Generation
     /// <summary>
@@ -16,33 +20,110 @@ public class LevelGenerator : MonoBehaviour
     public void GenerateLayout()
     {
         ClearDebugCircles();
+        nbSpawnedRoom = 0;
 
-        List<Vector2> posTaken = new List<Vector2>();
         List<LayoutRoom> spawnedRooms = new List<LayoutRoom>();
-        int nbSpawnedRoom = 0;
 
         //First Room
-        LayoutRoom firstRoom = new LayoutRoom(Vector2.zero);
+        LayoutRoom firstRoom = new LayoutRoom(Vector2.zero, Vector2.zero);
         spawnedRooms.Add(firstRoom);
-        posTaken.Add(firstRoom.Pos);
         nbSpawnedRoom++;
 
         while (nbSpawnedRoom < nbRoom)
         {
-            //Chose the room we are going to expend from
+            RepaintWhiteCircle();
+            //Chose the room to expend from
             LayoutRoom chosenRoom = ChooseChosenRoom(spawnedRooms);
 
-            //Expend by spawning a new room
-            LayoutRoom newRoom = new LayoutRoom(PickSpawnLocation(chosenRoom.Pos, posTaken));
+            //Expend
+            float branchOutRdm = Random.Range(0.0f, 1.0f);
+            Debug.Log("rdm : " + branchOutRdm);
+
+            if (chosenRoom.Forward == Vector2.zero) //on est sur la room de départ
+            {
+                Debug.Log("first room");
+                CreateBranch(chosenRoom.Position, spawnedRooms, 4);
+            }
+            else if (branchOutRdm > 1 - branchOutProbability) //Branch out
+            {
+                Debug.Log("branching out");
+                int nbBranchRoom = Random.Range(1, 4);
+                CreateBranch(chosenRoom.Position, spawnedRooms, nbBranchRoom);
+            }
+            else //spawn room forward
+            {
+                Debug.Log("forward room");
+                SpawnForwardRoom(chosenRoom.Position, spawnedRooms);
+            }
+        }
+    }
+
+    public void SpawnForwardRoom(Vector2 currentPos, List<LayoutRoom> spawnedRooms)
+    {
+        LayoutRoom currentRoom = spawnedRooms.Find(r => r.Position == currentPos);
+        Vector2 newRoomPos = currentRoom.Position + currentRoom.Forward;
+
+        LayoutRoom newRoom = new LayoutRoom(newRoomPos, currentRoom.Forward);
+
+        if (spawnedRooms.FindIndex(r => r.Position == newRoomPos) == -1)
+        {
             spawnedRooms.Add(newRoom);
-            posTaken.Add(newRoom.Pos);
+        }
+        else
+        {
+            spawnedRooms[spawnedRooms.FindIndex(r => r.Position == newRoomPos)] = newRoom;
+        }
+        UpdateNeighborsSlots(newRoom, spawnedRooms);
+        nbSpawnedRoom++;
+        Instantiate(Resources.Load("DebugCircle"), newRoomPos, Quaternion.identity);
+    }
 
-            Instantiate(Resources.Load("DebugCircle"), newRoom.Pos, Quaternion.identity);
+    public void CreateBranch(Vector2 currentPos, List<LayoutRoom> spawnedRooms, int nbRoomToSpawn)
+    {
+        int branchNbSpawnedRoom = 0;
+        LayoutRoom currentRoom = spawnedRooms.Find(r => r.Position == currentPos);
 
-            //Update neibhors of the new room
-            UpdateNeighborsSlots(newRoom, spawnedRooms);
+        while (!currentRoom.isSurrounded() && branchNbSpawnedRoom < nbRoomToSpawn)
+        {
+            Vector2 newRoomPos = PickSpawnLocation(currentPos, spawnedRooms);
 
-            nbSpawnedRoom++;
+            if (newRoomPos == currentPos + Vector2.up)
+            {
+                LayoutRoom newRoom = new LayoutRoom(newRoomPos, Vector2.up);
+                spawnedRooms.Add(newRoom);
+                UpdateNeighborsSlots(newRoom, spawnedRooms);
+                nbSpawnedRoom++;
+
+                Instantiate(Resources.Load("DebugCircle"), newRoomPos, Quaternion.identity);
+            }
+            else if (newRoomPos == currentPos + Vector2.right)
+            {
+                LayoutRoom newRoom = new LayoutRoom(newRoomPos, Vector2.right);
+                spawnedRooms.Add(newRoom);
+                UpdateNeighborsSlots(newRoom, spawnedRooms);
+                nbSpawnedRoom++;
+
+                Instantiate(Resources.Load("DebugCircle"), newRoomPos, Quaternion.identity);
+            }
+            else if (newRoomPos == currentPos + Vector2.down)
+            {
+                LayoutRoom newRoom = new LayoutRoom(newRoomPos, Vector2.down);
+                spawnedRooms.Add(newRoom);
+                UpdateNeighborsSlots(newRoom, spawnedRooms);
+                nbSpawnedRoom++;
+
+                Instantiate(Resources.Load("DebugCircle"), newRoomPos, Quaternion.identity);
+            }
+            else if (newRoomPos == currentPos + Vector2.left)
+            {
+                LayoutRoom newRoom = new LayoutRoom(newRoomPos, Vector2.left);
+                spawnedRooms.Add(newRoom);
+                UpdateNeighborsSlots(newRoom, spawnedRooms);
+                nbSpawnedRoom++;
+
+                Instantiate(Resources.Load("DebugCircle"), newRoomPos, Quaternion.identity);
+            }
+            branchNbSpawnedRoom++;
         }
     }
 
@@ -72,7 +153,7 @@ public class LevelGenerator : MonoBehaviour
     /// <param name="currentPos"></param>
     /// <param name="posTaken"></param>
     /// <returns></returns>
-    private Vector2 PickSpawnLocation(Vector2 currentPos, List<Vector2> posTaken)
+    private Vector2 PickSpawnLocation(Vector2 currentPos, List<LayoutRoom> spawnedRooms)
     {
         List<Vector2> possiblePos = new List<Vector2>();
 
@@ -81,22 +162,22 @@ public class LevelGenerator : MonoBehaviour
         Vector2 up = currentPos + Vector2.up;
         Vector2 down = currentPos + Vector2.down;
 
-        if (!posTaken.Contains(up))
+        if (!spawnedRooms.Exists(r => r.Position == up))
         {
             possiblePos.Add(up);
         }
 
-        if (!posTaken.Contains(down))
+        if (!spawnedRooms.Exists(r => r.Position == down))
         {
             possiblePos.Add(down);
         }
 
-        if (!posTaken.Contains(right))
+        if (!spawnedRooms.Exists(r => r.Position == right))
         {
             possiblePos.Add(right);
         }
 
-        if (!posTaken.Contains(left))
+        if (!spawnedRooms.Exists(r => r.Position == left))
         {
             possiblePos.Add(left);
         }
@@ -111,33 +192,33 @@ public class LevelGenerator : MonoBehaviour
     /// <param name="spawnedRooms"></param>
     public void UpdateNeighborsSlots(LayoutRoom room, List<LayoutRoom> spawnedRooms)
     {
-        Vector2 right = room.Pos + Vector2.right;
-        Vector2 left = room.Pos + Vector2.left;
-        Vector2 up = room.Pos + Vector2.up;
-        Vector2 down = room.Pos + Vector2.down;
+        Vector2 right = room.Position + Vector2.right;
+        Vector2 left = room.Position + Vector2.left;
+        Vector2 up = room.Position + Vector2.up;
+        Vector2 down = room.Position + Vector2.down;
 
-        if (spawnedRooms.Exists(r => r.Pos == up))
+        if (spawnedRooms.Exists(r => r.Position == up))
         {
             room.NeighborSlots[0] = true;
-            spawnedRooms.Find(r => r.Pos == up).NeighborSlots[2] = true;
+            spawnedRooms.Find(r => r.Position == up).NeighborSlots[2] = true;
         }
 
-        if (spawnedRooms.Exists(r => r.Pos == down))
+        if (spawnedRooms.Exists(r => r.Position == down))
         {
             room.NeighborSlots[2] = true;
-            spawnedRooms.Find(r => r.Pos == down).NeighborSlots[0] = true;
+            spawnedRooms.Find(r => r.Position == down).NeighborSlots[0] = true;
         }
 
-        if (spawnedRooms.Exists(r => r.Pos == right))
+        if (spawnedRooms.Exists(r => r.Position == right))
         {
             room.NeighborSlots[1] = true;
-            spawnedRooms.Find(r => r.Pos == right).NeighborSlots[3] = true;
+            spawnedRooms.Find(r => r.Position == right).NeighborSlots[3] = true;
         }
 
-        if (spawnedRooms.Exists(r => r.Pos == left))
+        if (spawnedRooms.Exists(r => r.Position == left))
         {
             room.NeighborSlots[3] = true;
-            spawnedRooms.Find(r => r.Pos == left).NeighborSlots[1] = true;
+            spawnedRooms.Find(r => r.Position == left).NeighborSlots[1] = true;
         }
     }
     #endregion
