@@ -6,103 +6,73 @@ using Random = UnityEngine.Random;
 
 public class LevelGenerator : MonoBehaviour
 {
+    [Header("Layout")]
     public int nbRoom;
 
-    private List<Vector2> posTaken = new List<Vector2>();
-
-    private Vector2 debugRed;
-    // Start is called before the first frame update
-    void Start()
-    {
-        Test();
-    }
-
-    public void Test()
-    {
-        posTaken = new List<Vector2>();
-        List<Room> spawnedRooms = new List<Room>();
-
-        Room room1 = new Room(new Vector2(0,1));
-        Room room2 = new Room(new Vector2(0,-1));
-        Room room3 = new Room(new Vector2(1,0));
-        Room room4 = new Room(new Vector2(-1, 0));
-        Room room5 = new Room(new Vector2(0, 0));
-
-        spawnedRooms.Add(room1);
-        spawnedRooms.Add(room2);
-        spawnedRooms.Add(room3);
-        spawnedRooms.Add(room4);
-        spawnedRooms.Add(room5);
-
-        posTaken.Add(room1.Pos);
-        posTaken.Add(room2.Pos);
-        posTaken.Add(room3.Pos);
-        posTaken.Add(room4.Pos);
-        posTaken.Add(room5.Pos);
-
-        UpdateNeighborsSlots(room1);
-        UpdateNeighborsSlots(room2);
-        UpdateNeighborsSlots(room3);
-        UpdateNeighborsSlots(room4);
-        UpdateNeighborsSlots(room5);
-
-        Debug.Log("Room 1 : "+room1.PrintNeighborSlots());
-        Debug.Log("Room 2 : "+room2.PrintNeighborSlots());
-        Debug.Log("Room 3 : "+room3.PrintNeighborSlots());
-        Debug.Log("Room 4 : "+room4.PrintNeighborSlots());
-        Debug.Log("Room 5 : "+room5.PrintNeighborSlots());
-
-        Debug.Log(room1.isSurrounded());
-
-        int rdm = Random.Range(0, 0);
-        Debug.Log(rdm);
-    }
-
+    #region Layout Generation
+    /// <summary>
+    /// Generates the layout of the level. ie: Where the room will appear later
+    /// </summary>
     public void GenerateLayout()
     {
-        posTaken = new List<Vector2>();
-        List<Room> spawnedRooms = new List<Room>();
+        ClearDebugCircles();
+
+        List<Vector2> posTaken = new List<Vector2>();
+        List<LayoutRoom> spawnedRooms = new List<LayoutRoom>();
         int nbSpawnedRoom = 0;
 
-        //first Room
-        Room firstRoom = new Room(Vector2.zero);
+        //First Room
+        LayoutRoom firstRoom = new LayoutRoom(Vector2.zero);
         spawnedRooms.Add(firstRoom);
         posTaken.Add(firstRoom.Pos);
         nbSpawnedRoom++;
 
         while (nbSpawnedRoom < nbRoom)
         {
-            //choisir UNE room parmis celles déjà spawn
-            Room chosenRoom = ChooseChosenRoom(spawnedRooms);
-            Debug.Log(chosenRoom.isSurrounded());
-            //debugRed = chosenRoom.Pos;
+            //Chose the room we are going to expend from
+            LayoutRoom chosenRoom = ChooseChosenRoom(spawnedRooms);
 
-            //faire la propagation
-            Room newRoom = new Room(PickSpawnLocation(chosenRoom.Pos));
+            //Expend by spawning a new room
+            LayoutRoom newRoom = new LayoutRoom(PickSpawnLocation(chosenRoom.Pos, posTaken));
             spawnedRooms.Add(newRoom);
             posTaken.Add(newRoom.Pos);
 
-            //On update les voisins autours de la chosenRoom et de celle qu'on vient de spawn
-            UpdateNeighborsSlots(chosenRoom);
-            UpdateNeighborsSlots(newRoom);
+            Instantiate(Resources.Load("DebugCircle"), newRoom.Pos, Quaternion.identity);
+
+            //Update neibhors of the new room
+            UpdateNeighborsSlots(newRoom, spawnedRooms);
 
             nbSpawnedRoom++;
         }
-    } 
+    }
 
-    public Room ChooseChosenRoom(List<Room> spawnedRooms)
+    /// <summary>
+    /// Pick a room in the list of already spawned rooms thta has at least one free slot
+    /// </summary>
+    /// <param name="spawnedRooms"></param>
+    /// <returns></returns>
+    public LayoutRoom ChooseChosenRoom(List<LayoutRoom> spawnedRooms)
     {
-        Room chosenRoom = spawnedRooms[Random.Range(0, spawnedRooms.Count)];
+        int rdm = Random.Range(0, spawnedRooms.Count);
+
+        LayoutRoom chosenRoom = spawnedRooms[rdm];
 
         while (chosenRoom.isSurrounded())
         {
-            chosenRoom = spawnedRooms[Random.Range(0, spawnedRooms.Count)];
+            rdm = Random.Range(0, spawnedRooms.Count);
+            chosenRoom = spawnedRooms[rdm];
         }
 
         return chosenRoom;
     }
 
-    private Vector2 PickSpawnLocation(Vector2 currentPos)
+    /// <summary>
+    /// Pick a slot to spawn the room in around the currentPos in parameters
+    /// </summary>
+    /// <param name="currentPos"></param>
+    /// <param name="posTaken"></param>
+    /// <returns></returns>
+    private Vector2 PickSpawnLocation(Vector2 currentPos, List<Vector2> posTaken)
     {
         List<Vector2> possiblePos = new List<Vector2>();
 
@@ -130,46 +100,67 @@ public class LevelGenerator : MonoBehaviour
         {
             possiblePos.Add(left);
         }
+
         return possiblePos[Random.Range(0, possiblePos.Count)];
     }
 
-    public void UpdateNeighborsSlots(Room room)
+    /// <summary>
+    /// Update the neighbors of the room in parameters and of it's neighbors
+    /// </summary>
+    /// <param name="room"></param>
+    /// <param name="spawnedRooms"></param>
+    public void UpdateNeighborsSlots(LayoutRoom room, List<LayoutRoom> spawnedRooms)
     {
         Vector2 right = room.Pos + Vector2.right;
         Vector2 left = room.Pos + Vector2.left;
         Vector2 up = room.Pos + Vector2.up;
         Vector2 down = room.Pos + Vector2.down;
 
-        if (posTaken.Contains(up))
+        if (spawnedRooms.Exists(r => r.Pos == up))
         {
             room.NeighborSlots[0] = true;
+            spawnedRooms.Find(r => r.Pos == up).NeighborSlots[2] = true;
         }
 
-        if (posTaken.Contains(down))
+        if (spawnedRooms.Exists(r => r.Pos == down))
         {
             room.NeighborSlots[2] = true;
+            spawnedRooms.Find(r => r.Pos == down).NeighborSlots[0] = true;
         }
 
-        if (posTaken.Contains(right))
+        if (spawnedRooms.Exists(r => r.Pos == right))
         {
             room.NeighborSlots[1] = true;
+            spawnedRooms.Find(r => r.Pos == right).NeighborSlots[3] = true;
         }
 
-        if (posTaken.Contains(left))
+        if (spawnedRooms.Exists(r => r.Pos == left))
         {
             room.NeighborSlots[3] = true;
+            spawnedRooms.Find(r => r.Pos == left).NeighborSlots[1] = true;
         }
     }
-    
+    #endregion
 
-    private void OnDrawGizmos()
+    #region Debug
+    public void ClearDebugCircles()
     {
-        foreach (Vector2 pos in posTaken)
-        {
-            Gizmos.DrawSphere(pos, 0.2f);
-        }
+        GameObject[] circles = GameObject.FindGameObjectsWithTag("DebugCircle");
 
-        Gizmos.color = Color.red;
-        Gizmos.DrawSphere(debugRed, 0.2f);
+        foreach (GameObject go in circles)
+        {
+            DestroyImmediate(go);
+        }
     }
+
+    public void RepaintWhiteCircle()
+    {
+        GameObject[] circles = GameObject.FindGameObjectsWithTag("DebugCircle");
+
+        foreach (GameObject go in circles)
+        {
+            go.GetComponent<SpriteRenderer>().color = Color.white;
+        }
+    }
+    #endregion
 }
