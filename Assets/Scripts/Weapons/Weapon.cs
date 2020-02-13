@@ -42,7 +42,6 @@ public class Weapon : MonoBehaviour
             transform.right = crosshairPos;
             crosshair.transform.position = transform.position + crosshairPos;
             shotsDirection = new Vector2(crosshair.transform.position.x - shotsPositions[0].transform.position.x, crosshair.transform.position.y - shotsPositions[0].transform.position.y);
-
         }
 
         Debug.Log(Input.GetAxisRaw("Horizontal"));
