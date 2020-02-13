@@ -11,14 +11,12 @@ public class LayoutRoom
     private bool[] neighborSlots; //True is there is a neighbor, false otherwise. Starts at 12h and goes clockwise.
     private Vector2 forward; //If we consider "backward' as the direction the room has been spawned from. forward is the opposite
     private int roomType;
-    private int distanceFromSpawn = 0;
     #region constructors
-    public LayoutRoom(Vector2 pos, Vector2 forward, int RoomType, int distanceFromSpawn)
+    public LayoutRoom(Vector2 pos, Vector2 forward, int RoomType)
     {
         position = pos;
         this.forward = forward;
         roomType = RoomType;
-        this.distanceFromSpawn = distanceFromSpawn;
         neighborSlots = new bool[] { false, false, false, false };
     }
     #endregion
@@ -45,11 +43,6 @@ public class LayoutRoom
     {
         get { return roomType; }
         set { roomType = value; }
-    }
-
-    public int DistanceFromSpawn
-    {
-        get { return distanceFromSpawn; }
     }
     #endregion
 

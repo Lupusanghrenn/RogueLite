@@ -25,7 +25,7 @@ public class LevelGenerator : MonoBehaviour
         List<LayoutRoom> spawnedRooms = new List<LayoutRoom>();
 
         //First Room
-        LayoutRoom firstRoom = new LayoutRoom(Vector2.zero, Vector2.zero, 0, 0);
+        LayoutRoom firstRoom = new LayoutRoom(Vector2.zero, Vector2.zero, 0);
         spawnedRooms.Add(firstRoom);
         nbSpawnedRoom++;
         Instantiate(Resources.Load("DebugCircle"), firstRoom.Position, Quaternion.identity);
@@ -36,24 +36,21 @@ public class LevelGenerator : MonoBehaviour
             //Chose the room to expend from
             LayoutRoom chosenRoom = ChoseRoom1Neighbor(spawnedRooms);
 
+
             //Expend
             float branchOutRdm = Random.Range(0.0f, 1.0f);
-            Debug.Log("rdm : " + branchOutRdm);
 
             if (chosenRoom.Forward == Vector2.zero) //on est sur la room de départ
             {
-                Debug.Log("first room");
                 CreateBranch(chosenRoom.Position, spawnedRooms, 4);
             }
             else if (branchOutRdm > 1 - branchOutProbability) //Branch out
             {
-                Debug.Log("branching out");
                 int nbBranchRoom = Random.Range(1, 4);
                 CreateBranch(chosenRoom.Position, spawnedRooms, nbBranchRoom);
             }
             else //spawn room forward
             {
-                Debug.Log("forward room");
                 SpawnForwardRoom(chosenRoom.Position, spawnedRooms);
             }
         }
@@ -94,7 +91,7 @@ public class LevelGenerator : MonoBehaviour
         LayoutRoom currentRoom = spawnedRooms.Find(r => r.Position == currentPos);
         Vector2 newRoomPos = currentRoom.Position + currentRoom.Forward;
 
-        LayoutRoom newRoom = new LayoutRoom(newRoomPos, currentRoom.Forward, 0, currentRoom.DistanceFromSpawn + 1);
+        LayoutRoom newRoom = new LayoutRoom(newRoomPos, currentRoom.Forward, 0);
 
         if (spawnedRooms.FindIndex(r => r.Position == newRoomPos) == -1)
         {
@@ -104,9 +101,7 @@ public class LevelGenerator : MonoBehaviour
         {
             spawnedRooms[spawnedRooms.FindIndex(r => r.Position == newRoomPos)] = newRoom;
         }
-        UpdateNeighborsSlots(newRoom, spawnedRooms);
-        nbSpawnedRoom++;
-        Instantiate(Resources.Load("DebugCircle"), newRoomPos, Quaternion.identity);
+        SpawnRoom(newRoom, spawnedRooms);
     }
 
     public void CreateBranch(Vector2 currentPos, List<LayoutRoom> spawnedRooms, int nbRoomToSpawn)
@@ -120,42 +115,47 @@ public class LevelGenerator : MonoBehaviour
 
             if (newRoomPos == currentPos + Vector2.up)
             {
-                LayoutRoom newRoom = new LayoutRoom(newRoomPos, Vector2.up, 0, currentRoom.DistanceFromSpawn + 1);
-                spawnedRooms.Add(newRoom);
-                UpdateNeighborsSlots(newRoom, spawnedRooms);
-                nbSpawnedRoom++;
+                LayoutRoom newRoom = new LayoutRoom(newRoomPos, Vector2.up, 0);
+                SpawnRoom(newRoom, spawnedRooms);
 
-                Instantiate(Resources.Load("DebugCircle"), newRoomPos, Quaternion.identity);
+                LayoutRoom newRoom2 = new LayoutRoom(newRoom.Position + Vector2.up, Vector2.up, 0);
+                SpawnRoom(newRoom2, spawnedRooms);
             }
             else if (newRoomPos == currentPos + Vector2.right)
             {
-                LayoutRoom newRoom = new LayoutRoom(newRoomPos, Vector2.right, 0, currentRoom.DistanceFromSpawn + 1);
-                spawnedRooms.Add(newRoom);
-                UpdateNeighborsSlots(newRoom, spawnedRooms);
-                nbSpawnedRoom++;
+                LayoutRoom newRoom = new LayoutRoom(newRoomPos, Vector2.right, 0);
+                SpawnRoom(newRoom, spawnedRooms);
 
-                Instantiate(Resources.Load("DebugCircle"), newRoomPos, Quaternion.identity);
+                LayoutRoom newRoom2 = new LayoutRoom(newRoom.Position + Vector2.right, Vector2.right, 0);
+                SpawnRoom(newRoom2, spawnedRooms);
             }
             else if (newRoomPos == currentPos + Vector2.down)
             {
-                LayoutRoom newRoom = new LayoutRoom(newRoomPos, Vector2.down, 0, currentRoom.DistanceFromSpawn + 1);
-                spawnedRooms.Add(newRoom);
-                UpdateNeighborsSlots(newRoom, spawnedRooms);
-                nbSpawnedRoom++;
+                LayoutRoom newRoom = new LayoutRoom(newRoomPos, Vector2.down, 0);
+                SpawnRoom(newRoom, spawnedRooms);
 
-                Instantiate(Resources.Load("DebugCircle"), newRoomPos, Quaternion.identity);
+                LayoutRoom newRoom2 = new LayoutRoom(newRoom.Position + Vector2.down, Vector2.down, 0);
+                SpawnRoom(newRoom2, spawnedRooms);
             }
             else if (newRoomPos == currentPos + Vector2.left)
             {
-                LayoutRoom newRoom = new LayoutRoom(newRoomPos, Vector2.left, 0, currentRoom.DistanceFromSpawn + 1);
-                spawnedRooms.Add(newRoom);
-                UpdateNeighborsSlots(newRoom, spawnedRooms);
-                nbSpawnedRoom++;
+                LayoutRoom newRoom = new LayoutRoom(newRoomPos, Vector2.left, 0);
+                SpawnRoom(newRoom, spawnedRooms);
 
-                Instantiate(Resources.Load("DebugCircle"), newRoomPos, Quaternion.identity);
+                LayoutRoom newRoom2 = new LayoutRoom(newRoom.Position + Vector2.left, Vector2.left, 0);
+                SpawnRoom(newRoom2, spawnedRooms);
             }
             branchNbSpawnedRoom++;
         }
+    }
+
+    public void SpawnRoom(LayoutRoom roomToSpawn, List<LayoutRoom> spawnedRooms)
+    {
+        spawnedRooms.Add(roomToSpawn);
+        UpdateNeighborsSlots(roomToSpawn, spawnedRooms);
+        nbSpawnedRoom++;
+
+        Instantiate(Resources.Load("DebugCircle"), roomToSpawn.Position, Quaternion.identity);
     }
 
     /// <summary>
