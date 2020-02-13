@@ -2,8 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Room
+/// <summary>
+/// this class' goal is to store data while making the room layout of the Level (first step of the level generation)
+/// </summary>
+public class LayoutRoom
 {
+    /// <summary>
+    /// 2D pos of the room
+    /// </summary>
     private Vector2 pos;
 
     /// <summary>
@@ -12,19 +18,19 @@ public class Room
     private bool[] neighborSlots;
 
     #region constructors
-    public Room()
+    public LayoutRoom()
     {
         pos = Vector2.zero;
         neighborSlots = new bool[] { false, false, false, false};
     }
     
-    public Room(Vector2 p)
+    public LayoutRoom(Vector2 p)
     {
         pos = p;
         neighborSlots = new bool[] { false, false, false, false };
     }
 
-    public Room(Vector2 p, bool[] b)
+    public LayoutRoom(Vector2 p, bool[] b)
     {
         pos = p;
         neighborSlots = b;
@@ -45,7 +51,7 @@ public class Room
     #endregion
 
     #region Methods
-    public bool Equals(Room r2)
+    public bool Equals(LayoutRoom r2)
     {
         return this.pos == r2.pos;
     }
@@ -61,25 +67,6 @@ public class Room
                 res = false;
             }
         }
-        return res;
-    }
-
-    public string PrintNeighborSlots()
-    {
-        string res = "";
-
-        for (int i = 0; i < neighborSlots.Length; i++)
-        {
-            if (neighborSlots[i])
-            {
-                res += "true ";
-            }
-            else
-            {
-                res += "false ";
-            }
-        }
-
         return res;
     }
     #endregion

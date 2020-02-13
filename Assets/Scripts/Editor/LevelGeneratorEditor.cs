@@ -15,5 +15,11 @@ public class LevelGeneratorEditor : Editor
             levelGenerator.GenerateLayout();
             UnityEditor.SceneView.RepaintAll();
         }
+
+        if (GUILayout.Button("Clear"))
+        {
+            levelGenerator.ClearDebugCircles();
+            UnityEditor.SceneView.RepaintAll();
+        }
     }
 }
