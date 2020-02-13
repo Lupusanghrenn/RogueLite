@@ -6,10 +6,13 @@ using Random = UnityEngine.Random;
 
 public class LevelGenerator : MonoBehaviour
 {
+    public bool debug = false;
+
     [Header("Layout")]
     public int nbRoom;
     [Range(0.0f, 1.0f)]
     public float branchOutProbability;
+    public bool allowRoomStacks;
 
     private int nbSpawnedRoom;
 
@@ -28,13 +31,23 @@ public class LevelGenerator : MonoBehaviour
         LayoutRoom firstRoom = new LayoutRoom(Vector2.zero, Vector2.zero, 0);
         spawnedRooms.Add(firstRoom);
         nbSpawnedRoom++;
-        Instantiate(Resources.Load("DebugCircle"), firstRoom.Position, Quaternion.identity);
+        if (debug) { Instantiate(Resources.Load("DebugCircle"), firstRoom.Position, Quaternion.identity); }
 
         while (nbSpawnedRoom < nbRoom)
         {
             RepaintWhiteCircle();
+
             //Chose the room to expend from
-            LayoutRoom chosenRoom = ChoseRoom1Neighbor(spawnedRooms);
+            LayoutRoom chosenRoom;
+            if (allowRoomStacks)
+            {
+                chosenRoom = ChoseValidRoom(spawnedRooms);
+            }
+            else
+            {
+                chosenRoom = ChoseRoom1Neighbor(spawnedRooms);
+            }
+
 
 
             //Expend
@@ -56,6 +69,44 @@ public class LevelGenerator : MonoBehaviour
         }
 
         ChoseBossRoom(spawnedRooms);
+        ChoseLevelUpRoom(spawnedRooms);
+        ChoseShopRoom(spawnedRooms);
+    }
+
+    public void ChoseLevelUpRoom(List<LayoutRoom> spawnedRooms)
+    {
+        //on choisi n'importe quelle room avec un seul voisin
+        LayoutRoom room;
+        do
+        {
+            room = ChoseRoom1Neighbor(spawnedRooms);
+        } while (room.RoomType != 0);
+
+        room.RoomType = 2;
+
+        if (debug)
+        {
+            GameObject yellowCircle = (GameObject)Instantiate(Resources.Load("DebugCircle"), room.Position, Quaternion.identity); ;
+            yellowCircle.GetComponent<SpriteRenderer>().color = Color.yellow;
+        }
+    }
+
+    public void ChoseShopRoom(List<LayoutRoom> spawnedRooms)
+    {
+        //on choisi n'importe quelle room avec un seul voisin
+        LayoutRoom room;
+        do
+        {
+            room = ChoseRoom1Neighbor(spawnedRooms);
+        } while (room.RoomType != 0);
+
+        room.RoomType = 3;
+
+        if (debug)
+        {
+            GameObject blueCircle = (GameObject)Instantiate(Resources.Load("DebugCircle"), room.Position, Quaternion.identity); ;
+            blueCircle.GetComponent<SpriteRenderer>().color = Color.blue;
+        }
     }
 
     /// <summary>
@@ -66,8 +117,11 @@ public class LevelGenerator : MonoBehaviour
     {
         LayoutRoom bossRoom = FindFurthestRoom(spawnedRooms);
         bossRoom.RoomType = 1;
-        GameObject redCircle = (GameObject)Instantiate(Resources.Load("DebugCircle"), bossRoom.Position, Quaternion.identity); ;
-        redCircle.GetComponent<SpriteRenderer>().color = Color.red;
+        if (debug)
+        {
+            GameObject redCircle = (GameObject)Instantiate(Resources.Load("DebugCircle"), bossRoom.Position, Quaternion.identity); ;
+            redCircle.GetComponent<SpriteRenderer>().color = Color.red;
+        }
     }
 
     public LayoutRoom FindFurthestRoom(List<LayoutRoom> spawnedRooms)
@@ -96,12 +150,15 @@ public class LevelGenerator : MonoBehaviour
         if (spawnedRooms.FindIndex(r => r.Position == newRoomPos) == -1)
         {
             spawnedRooms.Add(newRoom);
+            SpawnRoom(newRoom, spawnedRooms);
         }
         else
         {
             spawnedRooms[spawnedRooms.FindIndex(r => r.Position == newRoomPos)] = newRoom;
+            UpdateNeighborsSlots(newRoom, spawnedRooms);
+
+            if (debug) { Instantiate(Resources.Load("DebugCircle"), newRoom.Position, Quaternion.identity); }
         }
-        SpawnRoom(newRoom, spawnedRooms);
     }
 
     public void CreateBranch(Vector2 currentPos, List<LayoutRoom> spawnedRooms, int nbRoomToSpawn)
@@ -155,11 +212,11 @@ public class LevelGenerator : MonoBehaviour
         UpdateNeighborsSlots(roomToSpawn, spawnedRooms);
         nbSpawnedRoom++;
 
-        Instantiate(Resources.Load("DebugCircle"), roomToSpawn.Position, Quaternion.identity);
+        if (debug){ Instantiate(Resources.Load("DebugCircle"), roomToSpawn.Position, Quaternion.identity); }
     }
 
     /// <summary>
-    /// Pick a room in the list of already spawned rooms thta has at least one free slot
+    /// Pick a room in the list of already spawned rooms that has at least one free slot
     /// </summary>
     /// <param name="spawnedRooms"></param>
     /// <returns></returns>
@@ -180,19 +237,60 @@ public class LevelGenerator : MonoBehaviour
 
     /// <summary>
     /// Pick a room in the list of already spawned rooms that has only 1 neighbor
+    /// </summary>
     public LayoutRoom ChoseRoom1Neighbor(List<LayoutRoom> spawnedRooms)
     {
         int rdm = Random.Range(0, spawnedRooms.Count);
 
         LayoutRoom chosenRoom = spawnedRooms[rdm];
 
-        while (chosenRoom.NbNeighbors() != 1 && chosenRoom.isSurrounded())
+        while ((chosenRoom.NbNeighbors() > 1 || chosenRoom.isSurrounded()))
         {
             rdm = Random.Range(0, spawnedRooms.Count);
             chosenRoom = spawnedRooms[rdm];
         }
 
         return chosenRoom;
+    }
+
+
+    /// <summary>
+    /// Scout the surroundings of a position and returns the number of neighbors
+    /// </summary>
+    /// <param name="pos"></param>
+    /// <param name="spawnedRooms"></param>
+    /// <returns></returns>
+    public int NbNeighborsAtPos(Vector2 pos, List<LayoutRoom> spawnedRooms)
+    {
+        int cpt = 0;
+        List<Vector2> surroundings = new List<Vector2>();
+
+        Vector2 right = pos + Vector2.right;
+        Vector2 left = pos + Vector2.left;
+        Vector2 up = pos + Vector2.up;
+        Vector2 down = pos + Vector2.down;
+
+        if (!spawnedRooms.Exists(r => r.Position == up))
+        {
+            cpt++;
+        }
+
+        if (!spawnedRooms.Exists(r => r.Position == down))
+        {
+            cpt++;
+        }
+
+        if (!spawnedRooms.Exists(r => r.Position == right))
+        {
+            cpt++;
+        }
+
+        if (!spawnedRooms.Exists(r => r.Position == left))
+        {
+            cpt++;
+        }
+
+        return cpt;
     }
 
     /// <summary>
