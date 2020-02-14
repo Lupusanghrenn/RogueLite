@@ -21,6 +21,20 @@ public class Player : MonoBehaviour
         Stats.Print();
     }
 
+    //input Actions
+    public void OnMove(){
+        Debug.Log("Move");
+    }
+
+    public void OnFire(){
+        Debug.Log("Fire");
+        //Weapon.Fire();
+    }
+
+    public void OnJump(){
+        Debug.Log("Jump");
+    }
+
     // Update is called once per frame
     void Update()
     {
