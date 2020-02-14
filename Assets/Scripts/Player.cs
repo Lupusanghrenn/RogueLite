@@ -1,12 +1,15 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
+
 
 public class Player : MonoBehaviour
 {
 
     public PlayerStat Stats;
     public StatModifier sm1,sm2;
+    protected new Rigidbody2D rigidbody;
     // Start is called before the first frame update
     void Awake()
     {
@@ -19,11 +22,14 @@ public class Player : MonoBehaviour
         GetComponent<SpriteRenderer>().sprite=Stats.Sprite;
 
         Stats.Print();
+        rigidbody = GetComponent<Rigidbody2D>(); 
     }
 
     //input Actions
-    public void OnMove(){
+    public void OnMove(InputValue inputValue){
         Debug.Log("Move");
+        var value = inputValue.Get<Vector2>();
+        rigidbody.MovePosition(value);
     }
 
     public void OnFire(){
