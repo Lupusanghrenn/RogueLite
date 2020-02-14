@@ -22,7 +22,7 @@ public class @RogueLiteInputAction : IInputActionCollection, IDisposable
                     ""name"": ""Move"",
                     ""type"": ""Value"",
                     ""id"": ""a44913c3-8c3c-4f9b-96ec-42a8fd9091f5"",
-                    ""expectedControlType"": ""Vector2"",
+                    ""expectedControlType"": ""Analog"",
                     ""processors"": """",
                     ""interactions"": """"
                 },
