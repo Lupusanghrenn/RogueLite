@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc04600026fa19e4e97eb779c9c7d5ec, type: 3}
+  m_Name: Ninja
+  m_EditorClassIdentifier: 
+  Name: Ninja
+  Description: Ouais il est un ninja
+  Sprite: {fileID: 21300000, guid: 097737625e3c0e8419ccfffab34674a8, type: 3}
+  Health: 25
+  Speed: 3
+  JumpHeight: 2
+  Attack: 23
+  RateOfFire: 2
+  Luck: 2
+  Lifesteal: 2
+  NumberOfJump: 0
