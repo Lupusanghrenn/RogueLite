@@ -10,15 +10,9 @@ public class LevelGeneratorEditor : Editor
         base.OnInspectorGUI();
 
         LevelGenerator levelGenerator = (LevelGenerator)target;
-        if (GUILayout.Button("Generate Level"))
+        if (GUILayout.Button("Debug"))
         {
-            levelGenerator.GenerateLayout();
-            UnityEditor.SceneView.RepaintAll();
-        }
-
-        if (GUILayout.Button("Clear"))
-        {
-            levelGenerator.ClearDebugCircles();
+            levelGenerator.Debuging();
             UnityEditor.SceneView.RepaintAll();
         }
     }

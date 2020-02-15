@@ -7,36 +7,24 @@ using UnityEngine;
 /// </summary>
 public class LayoutRoom
 {
-    private Vector2 position; //Grid position of trhe room (not world position)
-    private bool[] neighborSlots; //True is there is a neighbor, false otherwise. Starts at 12h and goes clockwise.
-    private Vector2 forward; //If we consider "backward' as the direction the room has been spawned from. forward is the opposite
+    private Vector2Int position; //Grid position of trhe room (not world position)
     private int roomType;
+    private int distance;
+    private int nbNeighbors = 0;
+
     #region constructors
-    public LayoutRoom(Vector2 pos, Vector2 forward, int RoomType)
+    public LayoutRoom(Vector2Int pos, int RoomType)
     {
         position = pos;
-        this.forward = forward;
         roomType = RoomType;
-        neighborSlots = new bool[] { false, false, false, false };
+        distance = -1;
     }
     #endregion
 
     #region getter setters
-    public Vector2 Position
+    public Vector2Int Position
     {
         get { return position; }
-    }
-
-    public Vector2 Forward
-    {
-        get { return forward; }
-        set { forward = value; }
-    }
-
-    public bool[] NeighborSlots
-    {
-        get { return neighborSlots; }
-        set { neighborSlots = value; }
     }
 
     public int RoomType
@@ -44,39 +32,17 @@ public class LayoutRoom
         get { return roomType; }
         set { roomType = value; }
     }
-    #endregion
 
-    #region Methods
-    public bool Equals(LayoutRoom r2)
+    public int Distance
     {
-        return this.position == r2.position;
+        get { return distance; }
+        set { distance = value; }
     }
 
-    public bool isSurrounded()
+    public int NbNeighbors
     {
-        bool res = true;
-
-        for (int i = 0; i < neighborSlots.Length; i++)
-        {
-            if (!neighborSlots[i])
-            {
-                res = false;
-            }
-        }
-        return res;
-    }
-
-    public int NbNeighbors()
-    {
-        int nb = 0;
-        foreach (bool b in neighborSlots)
-        {
-            if (b)
-            {
-                nb++;
-            }
-        }
-        return nb;
+        get { return nbNeighbors; }
+        set { nbNeighbors = value; }
     }
     #endregion
 }
