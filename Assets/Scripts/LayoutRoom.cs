@@ -45,4 +45,22 @@ public class LayoutRoom
         set { nbNeighbors = value; }
     }
     #endregion
+
+
+    public void UpdateNeighbors(List<LayoutRoom> spawnedRooms)
+    {
+        int nb = 0;
+        
+        if (spawnedRooms.Exists(r => r.Position == position + Vector2Int.up))
+            nb++;
+        if (spawnedRooms.Exists(r => r.Position == position + Vector2Int.right))
+            nb++;
+        if (spawnedRooms.Exists(r => r.Position == position + Vector2Int.down))
+            nb++;
+        if (spawnedRooms.Exists(r => r.Position == position + Vector2Int.left))
+            nb++;
+            
+        nbNeighbors = nb;
+    }
+
 }
