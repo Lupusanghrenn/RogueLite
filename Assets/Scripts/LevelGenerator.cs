@@ -9,6 +9,8 @@ public class LevelGenerator : MonoBehaviour
     [Header("Layout")]
     public int nbRoom;
     public Vector2Int mapSize;
+    [Range(0.0f, 1.0f)]
+    public float chanceBranch;
 
     //2D array of the room layout
     private LayoutRoom[,] rooms;
@@ -36,7 +38,18 @@ public class LevelGenerator : MonoBehaviour
         while (spawnedRooms.Count < nbRoom && cpt < 1000)
         {
             LayoutRoom chosenRoom = PickRandomRoom();
-            Expand(chosenRoom);
+
+            float rdmBranch = Random.Range(0.0f, 1.0f);
+
+            if (rdmBranch > 1 - chanceBranch) //branch
+            {
+                ExpandVertically(chosenRoom);
+            }
+            else //expand normally
+            {
+                ExpandHorizontally(chosenRoom);
+            }
+
             cpt++;
         }
 
@@ -52,18 +65,59 @@ public class LevelGenerator : MonoBehaviour
         Debug.Log("Initialisation terminée ! Taille : " + mapSize.x + " x " + mapSize.y);
     }
 
-    public void ExpandHorizontally()
+    public void ExpandVertically(LayoutRoom room)
     {
+        //on détecte les free slots autours
+        List<Vector2Int> possiblePos = GetEmptyValidSpotsAtPos(room.Position, false, true);
 
+        //on fait spawn des rooms
+        int rdm;
+
+        if (possiblePos.Count == 1)
+            rdm = Random.Range(0, possiblePos.Count + 1);
+        else
+            rdm = Random.Range(0, possiblePos.Count);
+
+
+        for (int i = 0; i < rdm; i++)
+        {
+            SpawnRoom(new LayoutRoom(possiblePos[Random.Range(0, possiblePos.Count)], 0));
+        }
+    }
+
+    public void ExpandHorizontally(LayoutRoom room)
+    {
+        //on détecte les free slots autours
+        List<Vector2Int> possiblePos = GetEmptyValidSpotsAtPos(room.Position, true, false);
+
+        //on fait spawn des rooms
+        int rdm;
+
+        if (possiblePos.Count == 1)
+            rdm = Random.Range(0, possiblePos.Count + 1);
+        else
+            rdm = Random.Range(0, possiblePos.Count);
+
+
+        for (int i = 0; i < rdm; i++)
+        {
+            SpawnRoom(new LayoutRoom(possiblePos[Random.Range(0, possiblePos.Count)], 0));
+        }
     }
 
     public void Expand(LayoutRoom room)
     {
         //on détecte les free slots autours
-        List<Vector2Int> possiblePos = GetEmptyValidSpotsAtPos(room.Position);
+        List<Vector2Int> possiblePos = GetEmptyValidSpotsAtPos(room.Position, true, true);
 
         //on fait spawn des rooms
-        int rdm = Random.Range(0, possiblePos.Count);
+        int rdm;
+
+        if (possiblePos.Count == 1)
+            rdm = Random.Range(0, possiblePos.Count + 1);
+        else
+            rdm = Random.Range(0, possiblePos.Count);
+
 
         for (int i = 0; i < rdm; i++)
         {
@@ -73,12 +127,27 @@ public class LevelGenerator : MonoBehaviour
 
 
 
-
+    /// <summary> 
+    /// returns a random room from the spawned rooms
+    /// </summary>
+    /// <returns></returns>
     public LayoutRoom PickRandomRoom()
     {
         return spawnedRooms[Random.Range(0, spawnedRooms.Count)];
     }
 
+
+    //TODO : FIX
+    public LayoutRoom Pick1NeighborRoom()
+    {
+        List<LayoutRoom> possibleRooms = GetRooms1Neighbor();
+        return possibleRooms[Random.Range(0, possibleRooms.Count)];
+    }
+
+    /// <summary>
+    /// returns le list of rooms that has only one neighbor
+    /// </summary>
+    /// <returns></returns>
     public List<LayoutRoom> GetRooms1Neighbor()
     {
         List<LayoutRoom> rooms = new List<LayoutRoom>();
@@ -90,6 +159,9 @@ public class LevelGenerator : MonoBehaviour
         return rooms;
     }
 
+    /// <summary>
+    /// Create a room that has only one neighbor
+    /// </summary>
     public void CreateRoom1Neighbor()
     {
         bool done = false;
@@ -104,7 +176,7 @@ public class LevelGenerator : MonoBehaviour
             {
                 if (chosenRoom.NbNeighbors > 1)
                 {
-                    List<Vector2Int> freeSlots = GetEmptyValidSpotsAtPos(chosenRoom.Position);
+                    List<Vector2Int> freeSlots = GetEmptyValidSpotsAtPos(chosenRoom.Position, true, true);
                     if (freeSlots.Count > 0)
                     {
                         Vector2Int spawnPosition = freeSlots[Random.Range(0, freeSlots.Count)];
@@ -119,7 +191,7 @@ public class LevelGenerator : MonoBehaviour
             }
             else //Si aucune possibilité de spawn 1 room sans altérer celle qui n'ont déjà qu'un seul voisin, on spawn quand même une pour débloquer des possiblités
             {
-                List<Vector2Int> freeSlots = GetEmptyValidSpotsAtPos(chosenRoom.Position);
+                List<Vector2Int> freeSlots = GetEmptyValidSpotsAtPos(chosenRoom.Position, true, true);
                 if (freeSlots.Count > 0)
                 {
                     Vector2Int spawnPosition = freeSlots[Random.Range(0, freeSlots.Count)];
@@ -144,7 +216,10 @@ public class LevelGenerator : MonoBehaviour
 
 
 
-
+    /// <summary>
+    /// Add the roon in parameters  to all the necessary lists and update all the rooms' neighbors
+    /// </summary>
+    /// <param name="room"></param>
     public void SpawnRoom(LayoutRoom room)
     {
         rooms[room.Position.x, room.Position.y] = room;
@@ -152,11 +227,19 @@ public class LevelGenerator : MonoBehaviour
         UpdateAllRoomsNeighbors();
     }
 
+    /// <summary>
+    /// Return if the pos is in bounds of the 2D array
+    /// </summary>
+    /// <param name="pos"></param>
+    /// <returns></returns>
     public bool IsInBounds(Vector2Int pos)
     {
         return pos.x < mapSize.x && pos.x >= 0 && pos.y < mapSize.y && pos.y >= 0;
     }
 
+    /// <summary>
+    /// update NbNeighbors according to the neihbors aroud a room
+    /// </summary>
     public void UpdateAllRoomsNeighbors()
     {
         foreach (LayoutRoom room in spawnedRooms)
@@ -165,7 +248,12 @@ public class LevelGenerator : MonoBehaviour
         }
     }
 
-    public List<Vector2Int> GetEmptyValidSpotsAtPos(Vector2Int pos)
+    /// <summary>
+    /// return all the enpty positions around "pos"
+    /// </summary>
+    /// <param name="pos"></param>
+    /// <returns></returns>
+    public List<Vector2Int> GetEmptyValidSpotsAtPos(Vector2Int pos, bool hor, bool vert)
     {
         List<Vector2Int> possiblePos = new List<Vector2Int>();
 
@@ -175,14 +263,25 @@ public class LevelGenerator : MonoBehaviour
         Vector2Int left = pos + new Vector2Int(-1, 0);
 
         //on détecte les free slots autours
-        if (IsInBounds(up) && rooms[up.x, up.y] == null) { possiblePos.Add(up); }
-        if (IsInBounds(right) && rooms[right.x, right.y] == null) { possiblePos.Add(right); }
-        if (IsInBounds(down) && rooms[down.x, down.y] == null) { possiblePos.Add(down); }
-        if (IsInBounds(left) && rooms[left.x, left.y] == null) { possiblePos.Add(left); }
+        if (hor)
+        {
+            if (IsInBounds(right) && rooms[right.x, right.y] == null) { possiblePos.Add(right); }
+            if (IsInBounds(left) && rooms[left.x, left.y] == null) { possiblePos.Add(left); }
+        }
+        if (vert)
+        {
+            if (IsInBounds(up) && rooms[up.x, up.y] == null) { possiblePos.Add(up); }
+            if (IsInBounds(down) && rooms[down.x, down.y] == null) { possiblePos.Add(down); }
+        }
 
         return possiblePos;
     }
 
+    /// <summary>
+    /// return the number of room in the neighborhood of "pos"
+    /// </summary>
+    /// <param name="pos"></param>
+    /// <returns></returns>
     public int CountNeighborsAtPos(Vector2Int pos)
     {
         int nb = 0;
