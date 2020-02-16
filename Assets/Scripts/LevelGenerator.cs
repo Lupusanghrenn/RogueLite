@@ -60,7 +60,7 @@ public class LevelGenerator : MonoBehaviour
     public void Expand(LayoutRoom room)
     {
         //on détecte les free slots autours
-        List<Vector2Int> possiblePos = CheckNbNeighborsAtPos(room.Position);
+        List<Vector2Int> possiblePos = GetEmptyValidSpotsAtPos(room.Position);
 
         //on fait spawn des rooms
         int rdm = Random.Range(0, possiblePos.Count);
@@ -93,20 +93,28 @@ public class LevelGenerator : MonoBehaviour
     public void CreateRoom1Neighbor()
     {
         bool done = false;
+        int cpt = 0;
 
         while (!done)
         {
             LayoutRoom chosenRoom = PickRandomRoom();
-            List<Vector2Int> freeSlots = CheckNbNeighborsAtPos(chosenRoom.Position);
+            List<Vector2Int> freeSlots = GetEmptyValidSpotsAtPos(chosenRoom.Position);
             if (freeSlots.Count > 0)
             {
                 Vector2Int spawnPosition = freeSlots[Random.Range(0, freeSlots.Count)];
-                if (CheckNbNeighborsAtPos(spawnPosition).Count == 1)
+                if (CountNeighborsAtPos(spawnPosition) == 1)
                 {
                     SpawnRoom(new LayoutRoom(spawnPosition, 0));
                     done = true;
-                    Debug.Log("PP{PPPPPP " +spawnPosition);
+                    Debug.Log("PPPPPPPP " +spawnPosition);
                 }
+            }
+            cpt++;
+            if (cpt > 1000)
+            {
+
+                Debug.Log("boucle infinie");
+                break;
             }
         }
         DisplayLayout();
@@ -136,7 +144,7 @@ public class LevelGenerator : MonoBehaviour
         }
     }
 
-    public List<Vector2Int> CheckNbNeighborsAtPos(Vector2Int pos)
+    public List<Vector2Int> GetEmptyValidSpotsAtPos(Vector2Int pos)
     {
         List<Vector2Int> possiblePos = new List<Vector2Int>();
 
@@ -154,7 +162,22 @@ public class LevelGenerator : MonoBehaviour
         return possiblePos;
     }
 
+    public int CountNeighborsAtPos(Vector2Int pos)
+    {
+        int nb = 0;
 
+        Vector2Int up = pos + new Vector2Int(0, 1);
+        Vector2Int right = pos + new Vector2Int(1, 0);
+        Vector2Int down = pos + new Vector2Int(0, -1);
+        Vector2Int left = pos + new Vector2Int(-1, 0);
+
+        if (spawnedRooms.Exists(r => r.Position == up)) { nb++; }
+        if (spawnedRooms.Exists(r => r.Position == right)) { nb++; }
+        if (spawnedRooms.Exists(r => r.Position == down)) { nb++; }
+        if (spawnedRooms.Exists(r => r.Position == left)) { nb++; }
+
+        return nb;
+    }
 
 
 
