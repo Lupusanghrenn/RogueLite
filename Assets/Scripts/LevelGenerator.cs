@@ -93,33 +93,54 @@ public class LevelGenerator : MonoBehaviour
     public void CreateRoom1Neighbor()
     {
         bool done = false;
-        int cpt = 0;
+        int cptInfinite = 0;
+        int cptTries = 0;
 
         while (!done)
         {
             LayoutRoom chosenRoom = PickRandomRoom();
-            List<Vector2Int> freeSlots = GetEmptyValidSpotsAtPos(chosenRoom.Position);
-            if (freeSlots.Count > 0)
+            //on préfère faire spawn une nouvelle room de façon à ne pas transformer une room qui a déjà qu'un seul voisin en une qui en a deux
+            if (cptTries < 100) 
             {
-                Vector2Int spawnPosition = freeSlots[Random.Range(0, freeSlots.Count)];
-                if (CountNeighborsAtPos(spawnPosition) == 1)
+                if (chosenRoom.NbNeighbors > 1)
                 {
-                    SpawnRoom(new LayoutRoom(spawnPosition, 0));
-                    done = true;
-                    Debug.Log("PPPPPPPP " +spawnPosition);
+                    List<Vector2Int> freeSlots = GetEmptyValidSpotsAtPos(chosenRoom.Position);
+                    if (freeSlots.Count > 0)
+                    {
+                        Vector2Int spawnPosition = freeSlots[Random.Range(0, freeSlots.Count)];
+                        if (CountNeighborsAtPos(spawnPosition) == 1)
+                        {
+                            SpawnRoom(new LayoutRoom(spawnPosition, 0));
+                            done = true;
+                        }
+                    }
+                }
+                cptTries++;
+            }
+            else //Si aucune possibilité de spawn 1 room sans altérer celle qui n'ont déjà qu'un seul voisin, on spawn quand même une pour débloquer des possiblités
+            {
+                List<Vector2Int> freeSlots = GetEmptyValidSpotsAtPos(chosenRoom.Position);
+                if (freeSlots.Count > 0)
+                {
+                    Vector2Int spawnPosition = freeSlots[Random.Range(0, freeSlots.Count)];
+                    if (CountNeighborsAtPos(spawnPosition) == 1)
+                    {
+                        SpawnRoom(new LayoutRoom(spawnPosition, 0));
+                        done = true;
+                    }
                 }
             }
-            cpt++;
-            if (cpt > 1000)
-            {
 
-                Debug.Log("boucle infinie");
+            //protection anti boucle infinie de haute technologie
+            cptInfinite++;
+            if (cptInfinite > 1000)
+            {
+                Debug.Log("boucle infinie ");
                 break;
             }
         }
         DisplayLayout();
     }
-
 
 
 
