@@ -15,11 +15,14 @@ public class DroneMouvement : MonoBehaviour
     private float horizontalTimer=0;
     private float verticalTimer =0;
 
+    public GameObject bullet;
+
+    public bool shootsInGunDirection;
+
     // Start is called before the first frame update
     void Start()
     {
         initialPosition = transform.position;
-
     }
 
     // Update is called once per frame
@@ -31,5 +34,15 @@ public class DroneMouvement : MonoBehaviour
         verticalMouvement = new Vector3(0, Mathf.Sin(verticalTimer), 0)*distance;
 
         transform.position = initialPosition + verticalMouvement + horizontalMouvement;
+
+        if(shootsInGunDirection)
+        {
+            transform.right = transform.position - initialPosition;
+        }
+    }
+
+    public void Shoot()
+    {
+
     }
 }

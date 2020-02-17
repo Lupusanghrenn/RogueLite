@@ -277,8 +277,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   distance: 0.5
-  horizontalSpeed: 6
-  verticalSpeed: 12
+  horizontalSpeed: 1
+  verticalSpeed: 1
+  gunDirection: 1
 --- !u!212 &1054097246
 SpriteRenderer:
   m_ObjectHideFlags: 0
