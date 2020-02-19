@@ -27,7 +27,7 @@ public class LevelGenerator : MonoBehaviour
 
     private int cpt;
 
-    public void Debuging()
+    public void GenerateLayout()
     {
         Init();
 
@@ -67,6 +67,10 @@ public class LevelGenerator : MonoBehaviour
         }
 
         DisplayLayout();
+    }
+
+    public void Debuging()
+    {
     }
 
     public void Init()

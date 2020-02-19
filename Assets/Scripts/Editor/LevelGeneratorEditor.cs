@@ -10,15 +10,15 @@ public class LevelGeneratorEditor : Editor
         base.OnInspectorGUI();
 
         LevelGenerator levelGenerator = (LevelGenerator)target;
-        if (GUILayout.Button("Debug"))
+        if (GUILayout.Button("Generate"))
         {
-            levelGenerator.Debuging();
+            levelGenerator.GenerateLayout();
             UnityEditor.SceneView.RepaintAll();
         }
 
-        if (GUILayout.Button("add one room"))
+        if (GUILayout.Button("Clear"))
         {
-            levelGenerator.CreateRoom1Neighbor(true);
+            levelGenerator.ClearLayout();
             UnityEditor.SceneView.RepaintAll();
         }
     }
