@@ -11,6 +11,8 @@ public class LevelGenerator : MonoBehaviour
     public Vector2Int mapSize;
     [Range(0.0f, 1.0f)]
     public float chanceBranch;
+    [Range(0.0f, 1.0f)]
+    public float chanceDoubleVertical;
 
     //2D array of the room layout
     private LayoutRoom[,] rooms;
@@ -37,13 +39,13 @@ public class LevelGenerator : MonoBehaviour
 
         while (spawnedRooms.Count < nbRoom && cpt < 1000)
         {
-            LayoutRoom chosenRoom = PickRandomRoom();
+            LayoutRoom chosenRoom = Pick1NeighborRoom();
 
             float rdmBranch = Random.Range(0.0f, 1.0f);
 
             if (rdmBranch > 1 - chanceBranch) //branch
             {
-                ExpandVertically(chosenRoom);
+                ExpandVertically(chosenRoom, true);
             }
             else //expand normally
             {
@@ -65,7 +67,7 @@ public class LevelGenerator : MonoBehaviour
         Debug.Log("Initialisation terminée ! Taille : " + mapSize.x + " x " + mapSize.y);
     }
 
-    public void ExpandVertically(LayoutRoom room)
+    public void ExpandVertically(LayoutRoom room, bool allowDoubleSpawn)
     {
         //on détecte les free slots autours
         List<Vector2Int> possiblePos = GetEmptyValidSpotsAtPos(room.Position, false, true);
@@ -81,7 +83,14 @@ public class LevelGenerator : MonoBehaviour
 
         for (int i = 0; i < rdm; i++)
         {
-            SpawnRoom(new LayoutRoom(possiblePos[Random.Range(0, possiblePos.Count)], 0));
+            LayoutRoom spawnedRoom = new LayoutRoom(possiblePos[Random.Range(0, possiblePos.Count)], 0);
+            SpawnRoom(spawnedRoom);
+
+            if (allowDoubleSpawn && Random.Range(0.0f, 1.0f) > 1 - chanceDoubleVertical)
+            {
+                ExpandVertically(spawnedRoom, false);
+            }
+
         }
     }
 
@@ -137,7 +146,7 @@ public class LevelGenerator : MonoBehaviour
     }
 
 
-    //TODO : FIX
+    //TODO : Remplacer cette fonction par une fonction qui choisit les room avec le moins de voisins possible en priorité
     public LayoutRoom Pick1NeighborRoom()
     {
         List<LayoutRoom> possibleRooms = GetRooms1Neighbor();
