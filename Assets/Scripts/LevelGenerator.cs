@@ -10,9 +10,15 @@ public class LevelGenerator : MonoBehaviour
     public int nbRoom;
     public Vector2Int mapSize;
     [Range(0.0f, 1.0f)]
-    public float chanceBranch;
+    public float verticalityRatio;
     [Range(0.0f, 1.0f)]
     public float chanceDoubleVertical;
+    [Range(0.0f, 1.0f)]
+    public float randomessRatio;
+    public int nbShopRoom;
+    public int nbChestRoom;
+    public int nbBossRoom;
+    public int nbLevelUpRoom;
 
     //2D array of the room layout
     private LayoutRoom[,] rooms;
@@ -27,23 +33,18 @@ public class LevelGenerator : MonoBehaviour
 
         LayoutRoom firstRoom = new LayoutRoom(mapCenter, 0);
         SpawnRoom(firstRoom);
-        /*LayoutRoom room = new LayoutRoom(firstRoom.Position + new Vector2Int(1, 0), 0);
-        SpawnRoom(room);
-        SpawnRoom(new LayoutRoom(firstRoom.Position + new Vector2Int(-1, 0), 0));
-        SpawnRoom(new LayoutRoom(firstRoom.Position + new Vector2Int(0, -1), 0));
-        SpawnRoom(new LayoutRoom(firstRoom.Position + new Vector2Int(0, 1), 0));
-        SpawnRoom(new LayoutRoom(firstRoom.Position + new Vector2Int(1, 1), 0));
-        SpawnRoom(new LayoutRoom(firstRoom.Position + new Vector2Int(-1, 1), 0));
-        SpawnRoom(new LayoutRoom(firstRoom.Position + new Vector2Int(1, -1), 0));
-        SpawnRoom(new LayoutRoom(firstRoom.Position + new Vector2Int(-1, -1), 0));*/
 
-        while (spawnedRooms.Count < nbRoom && cpt < 1000)
+        int nbRoomToSpawn = Mathf.RoundToInt(nbRoom * (1 - randomessRatio));
+        int nbRdmSoloRoomAdded = Mathf.RoundToInt(nbRoom * randomessRatio);
+
+        //première boucle pour faire spawn le layout général
+        while (spawnedRooms.Count < nbRoomToSpawn && cpt < 1000)
         {
-            LayoutRoom chosenRoom = Pick1NeighborRoom();
+            LayoutRoom chosenRoom = PickRandomRoom();
 
             float rdmBranch = Random.Range(0.0f, 1.0f);
 
-            if (rdmBranch > 1 - chanceBranch) //branch
+            if (rdmBranch > 1 - verticalityRatio) //branch
             {
                 ExpandVertically(chosenRoom, true);
             }
@@ -51,6 +52,16 @@ public class LevelGenerator : MonoBehaviour
             {
                 ExpandHorizontally(chosenRoom);
             }
+
+            cpt++;
+        }
+
+        //seconde boucle pour mettre des room random par si par là
+        cpt = 0;
+
+        while (spawnedRooms.Count < nbRoomToSpawn + nbRdmSoloRoomAdded && cpt < 1000)
+        {
+            CreateRoom1Neighbor(true);
 
             cpt++;
         }
@@ -146,11 +157,17 @@ public class LevelGenerator : MonoBehaviour
     }
 
 
-    //TODO : Remplacer cette fonction par une fonction qui choisit les room avec le moins de voisins possible en priorité
-    public LayoutRoom Pick1NeighborRoom()
+    public LayoutRoom PickLeastNeighborRoom()
     {
-        List<LayoutRoom> possibleRooms = GetRooms1Neighbor();
-        return possibleRooms[Random.Range(0, possibleRooms.Count)];
+        List<LayoutRoom> sortedSpawnedRoom = spawnedRooms;
+        sortedSpawnedRoom.Sort(SortByNeighborCount);
+
+        return sortedSpawnedRoom[0];
+    }
+
+    public int SortByNeighborCount(LayoutRoom r1, LayoutRoom r2)
+    {
+        return r1.NbNeighbors.CompareTo(r2.NbNeighbors);
     }
 
     /// <summary>
@@ -171,7 +188,7 @@ public class LevelGenerator : MonoBehaviour
     /// <summary>
     /// Create a room that has only one neighbor
     /// </summary>
-    public void CreateRoom1Neighbor()
+    public void CreateRoom1Neighbor(bool canAlterate)
     {
         bool done = false;
         int cptInfinite = 0;
@@ -181,7 +198,7 @@ public class LevelGenerator : MonoBehaviour
         {
             LayoutRoom chosenRoom = PickRandomRoom();
             //on préfère faire spawn une nouvelle room de façon à ne pas transformer une room qui a déjà qu'un seul voisin en une qui en a deux
-            if (cptTries < 100) 
+            if (!canAlterate && cptTries < 100) 
             {
                 if (chosenRoom.NbNeighbors > 1)
                 {

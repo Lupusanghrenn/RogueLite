@@ -18,7 +18,7 @@ public class LevelGeneratorEditor : Editor
 
         if (GUILayout.Button("add one room"))
         {
-            levelGenerator.CreateRoom1Neighbor();
+            levelGenerator.CreateRoom1Neighbor(true);
             UnityEditor.SceneView.RepaintAll();
         }
     }

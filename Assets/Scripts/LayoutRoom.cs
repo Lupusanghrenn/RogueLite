@@ -62,5 +62,4 @@ public class LayoutRoom
             
         nbNeighbors = nb;
     }
-
 }
