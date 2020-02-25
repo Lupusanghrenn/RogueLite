@@ -21,5 +21,11 @@ public class LevelGeneratorEditor : Editor
             levelGenerator.ClearLayout();
             UnityEditor.SceneView.RepaintAll();
         }
+
+        if (GUILayout.Button("Dijkstra"))
+        {
+            levelGenerator.Dijkstra();
+            UnityEditor.SceneView.RepaintAll();
+        }
     }
 }

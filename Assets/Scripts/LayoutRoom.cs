@@ -19,6 +19,8 @@ public class LayoutRoom
         roomType = RoomType;
         distance = -1;
     }
+
+    public LayoutRoom() { }
     #endregion
 
     #region getter setters

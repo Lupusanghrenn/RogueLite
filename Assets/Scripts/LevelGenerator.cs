@@ -69,9 +69,60 @@ public class LevelGenerator : MonoBehaviour
         DisplayLayout();
     }
 
-    public void Debuging()
+
+
+
+
+
+
+    public void Dijkstra()
     {
+        List<LayoutRoom> roomsToExplore = new List<LayoutRoom>();
+
+        LayoutRoom firstRoom = spawnedRooms[0];
+        firstRoom.Distance = 0;
+        roomsToExplore.Add(firstRoom);
+        SetCircleValue(firstRoom.Position, firstRoom.Distance);
+
+        int i = 0;
+        while (roomsToExplore.Count > 0)
+        {
+            List<LayoutRoom> loopRoomsToExplore = new List<LayoutRoom>(roomsToExplore);
+            foreach (LayoutRoom room in loopRoomsToExplore)
+            {
+                List<LayoutRoom> neighbors = GetNeighborsAtPos(room.Position);
+                List<LayoutRoom> addedRooms = new List<LayoutRoom>();
+
+                foreach (LayoutRoom neighbor in neighbors)
+                {
+                    if (neighbor.Distance == -1 || room.Distance + 1 < neighbor.Distance)
+                    {
+                        neighbor.Distance = room.Distance + 1;
+                        addedRooms.Add(neighbor);
+                        SetCircleValue(neighbor.Position, neighbor.Distance);
+                    }
+                }
+                roomsToExplore.AddRange(addedRooms);
+                roomsToExplore.Remove(room);
+            }
+            i++;
+        }
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     public void Init()
     {
@@ -79,7 +130,6 @@ public class LevelGenerator : MonoBehaviour
         spawnedRooms = new List<LayoutRoom>();
         rooms = new LayoutRoom[mapSize.x, mapSize.y];
         mapCenter = new Vector2Int(Mathf.RoundToInt(mapSize.x / 2), Mathf.RoundToInt(mapSize.y / 2));
-        Debug.Log("Initialisation terminée ! Taille : " + mapSize.x + " x " + mapSize.y);
     }
 
     public void ExpandVertically(LayoutRoom room, bool allowDoubleSpawn)
@@ -151,6 +201,11 @@ public class LevelGenerator : MonoBehaviour
 
 
 
+
+
+
+
+
     /// <summary> 
     /// returns a random room from the spawned rooms
     /// </summary>
@@ -173,6 +228,14 @@ public class LevelGenerator : MonoBehaviour
     {
         return r1.NbNeighbors.CompareTo(r2.NbNeighbors);
     }
+
+
+
+
+
+
+
+
 
     /// <summary>
     /// returns le list of rooms that has only one neighbor
@@ -255,6 +318,7 @@ public class LevelGenerator : MonoBehaviour
         rooms[room.Position.x, room.Position.y] = room;
         spawnedRooms.Add(room);
         UpdateAllRoomsNeighbors();
+        SetCircleValue(room.Position, room.Distance);
     }
 
     /// <summary>
@@ -329,6 +393,23 @@ public class LevelGenerator : MonoBehaviour
         return nb;
     }
 
+    public List<LayoutRoom> GetNeighborsAtPos(Vector2Int pos)
+    {
+        List<LayoutRoom> neighbors = new List<LayoutRoom>();
+
+        Vector2Int up = pos + new Vector2Int(0, 1);
+        Vector2Int right = pos + new Vector2Int(1, 0);
+        Vector2Int down = pos + new Vector2Int(0, -1);
+        Vector2Int left = pos + new Vector2Int(-1, 0);
+
+        if (spawnedRooms.Exists(r => r.Position == up)) { neighbors.Add(spawnedRooms.Find(r => r.Position == up)); }
+        if (spawnedRooms.Exists(r => r.Position == right)) { neighbors.Add(spawnedRooms.Find(r => r.Position == right)); }
+        if (spawnedRooms.Exists(r => r.Position == down)) { neighbors.Add(spawnedRooms.Find(r => r.Position == down)); }
+        if (spawnedRooms.Exists(r => r.Position == left)) { neighbors.Add(spawnedRooms.Find(r => r.Position == left)); }
+
+        return neighbors;
+    }
+
 
 
 
@@ -361,6 +442,26 @@ public class LevelGenerator : MonoBehaviour
         foreach (GameObject go in circles)
         {
             DestroyImmediate(go);
+        }
+
+        GameObject[] squares = GameObject.FindGameObjectsWithTag("DebugSquare");
+
+        foreach (GameObject go in squares)
+        {
+            DestroyImmediate(go);
+        }
+    }
+
+    public void SetCircleValue(Vector2Int pos, int val)
+    {
+        GameObject[] circles = GameObject.FindGameObjectsWithTag("DebugCircle");
+
+        foreach (GameObject go in circles)
+        {
+            if (go.transform.position == new Vector3(pos.x, pos.y, 0))
+            {
+                go.GetComponent<DebugCircle>().value = val;
+            }
         }
     }
     #endregion
