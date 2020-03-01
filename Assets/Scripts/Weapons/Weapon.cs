@@ -1,83 +1,57 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class Weapon : MonoBehaviour
 {
-    //Weapon stats
+    public ScriptableWeapon weapon;
 
-    public float baseShotsPerSeconds;
+    //Weapon Stats
+
     private float currentShotsPerSeconds;
     private float fireRate;
     private float fireRateTimer;
-
-    public int baseBulletsPerShot;
+    private float currentDamageMultiplier;
     private int currentBulletsPerShot;
-
-    public float baseBulletConeAngle;
     private float currentBulletConeAngle;
-
-    public float baseShotsSpreadAngle;
     private float currentShotsSpreadAngle;
-
-    public int baseShotsAmmount;
     private int currentShotsAmmount;
+
+    public GameObject crosshair;
+    public Vector2 shotsDirection;
     public List<GameObject> shotsPositions;
 
-    public Vector2 shotsDirection;
 
-    //Bullet stats
+    // Bullet Stats
 
-    public GameObject ammo;
-    public GameObject crosshair;
+    public GameObject bullet;
+    public Bullet currentBullet;
 
-    public float baseShotsSpeed;
-    private float currentShotsSpeed;
-
-    public float baseDamageMultiplier;
-    private float currentDamageMultiplier;
-
-    public float baseBulletSize;
+    private float currentBulletSpeed;
+    private float currentSpeedDecrease;
+    private float currentDamage;
     private float currentBulletSize;
-
-    public float baseFireDamage;
     private float currentFireDamage;
-
-    public float basePoisonDamage;
     private float currentPoisonDamage;
-
-    public float baseIceDamage;
     private float currentIceDamage;
-
-    public float baseShockDamage;
     private float currentShockDamage;
-
-    public float baseHorizontalSpeed; // boomerang
     private float currentHorizontalSpeed;
-
-    public float baseVerticalSpeed; // sinus
     private float currentVerticalSpeed;
-
-    public float baseExplosionRadius;
     private float currentExplosionRadius;
-
-    public float baseGravityScale;
     private float currentGravityScale;
-
-    public float baseEnemyPenetration;
     private float currentEnemyPenetration;
-
-    public bool baseWallPenetration;
     private bool currentWallPenetration;
-
-    public bool baseHoming;
     private bool currentHoming;
 
-    public float CurrentShotsPerSeconds {
+
+    public float CurrentShotsPerSeconds
+    {
         get => currentShotsPerSeconds;
-        set {
+        set
+        {
             currentShotsPerSeconds += value;
-            if(currentShotsPerSeconds<=0)
+            if (currentShotsPerSeconds <= 0)
             {
                 currentShotsPerSeconds = 1;
             }
@@ -85,7 +59,21 @@ public class Weapon : MonoBehaviour
         }
     }
 
-    public int CurrentBulletsPerShot {
+    public float CurrentSpeedDecrease
+    {
+        get => currentSpeedDecrease;
+        set
+        {
+            currentSpeedDecrease *= value;
+            if(currentSpeedDecrease <= 0.95f)
+            {
+                currentSpeedDecrease = 0.95f;
+            }
+        }
+    }
+
+    public int CurrentBulletsPerShot
+    {
         get => currentBulletsPerShot;
         set
         {
@@ -97,7 +85,8 @@ public class Weapon : MonoBehaviour
         }
     }
 
-    public float CurrentBulletConeAngle {
+    public float CurrentBulletConeAngle
+    {
         get => currentBulletConeAngle;
         set
         {
@@ -109,7 +98,8 @@ public class Weapon : MonoBehaviour
         }
     }
 
-    public float CurrentShotsSpreadAngle {
+    public float CurrentShotsSpreadAngle
+    {
         get => currentShotsSpreadAngle;
         set
         {
@@ -121,7 +111,8 @@ public class Weapon : MonoBehaviour
         }
     }
 
-    public int CurrentShotsAmmount {
+    public int CurrentShotsAmmount
+    {
         get => currentShotsAmmount;
         set
         {
@@ -133,19 +124,21 @@ public class Weapon : MonoBehaviour
         }
     }
 
-    public float CurrentShotsSpeed {
-        get => currentShotsSpeed;
+    public float CurrentShotsSpeed
+    {
+        get => currentBulletSpeed;
         set
         {
-            currentShotsSpeed += value;
-            if (currentShotsSpeed <= 0.5f)
+            currentBulletSpeed += value;
+            if (currentBulletSpeed <= 0.5f)
             {
-                currentShotsSpeed = 0.5f;
+                currentBulletSpeed = 0.5f;
             }
         }
     }
 
-    public float CurrentDamageMultiplier {
+    public float CurrentDamageMultiplier
+    {
         get => currentDamageMultiplier;
         set
         {
@@ -157,7 +150,8 @@ public class Weapon : MonoBehaviour
         }
     }
 
-    public float CurrentBulletSize {
+    public float CurrentBulletSize
+    {
         get => currentBulletSize;
         set
         {
@@ -169,7 +163,8 @@ public class Weapon : MonoBehaviour
         }
     }
 
-    public float CurrentFireDamage {
+    public float CurrentFireDamage
+    {
         get => currentFireDamage;
         set
         {
@@ -181,7 +176,8 @@ public class Weapon : MonoBehaviour
         }
     }
 
-    public float CurrentPoisonDamage {
+    public float CurrentPoisonDamage
+    {
         get => currentPoisonDamage;
         set
         {
@@ -193,7 +189,8 @@ public class Weapon : MonoBehaviour
         }
     }
 
-    public float CurrentIceDamage {
+    public float CurrentIceDamage
+    {
         get => currentIceDamage;
         set
         {
@@ -205,7 +202,8 @@ public class Weapon : MonoBehaviour
         }
     }
 
-    public float CurrentShockDamage {
+    public float CurrentShockDamage
+    {
         get => currentShockDamage;
         set
         {
@@ -217,7 +215,8 @@ public class Weapon : MonoBehaviour
         }
     }
 
-    public float CurrentHorizontalSpeed {
+    public float CurrentHorizontalSpeed
+    {
         get => currentHorizontalSpeed;
         set
         {
@@ -229,7 +228,8 @@ public class Weapon : MonoBehaviour
         }
     }
 
-    public float CurrentVerticalSpeed {
+    public float CurrentVerticalSpeed
+    {
         get => currentVerticalSpeed;
         set
         {
@@ -241,7 +241,8 @@ public class Weapon : MonoBehaviour
         }
     }
 
-    public float CurrentExplosionRadius {
+    public float CurrentExplosionRadius
+    {
         get => currentExplosionRadius;
         set
         {
@@ -253,7 +254,8 @@ public class Weapon : MonoBehaviour
         }
     }
 
-    public float CurrentGravityScale {
+    public float CurrentGravityScale
+    {
         get => currentGravityScale;
         set
         {
@@ -265,7 +267,8 @@ public class Weapon : MonoBehaviour
         }
     }
 
-    public float CurrentEnemyPenetration {
+    public float CurrentEnemyPenetration
+    {
         get => currentEnemyPenetration;
         set
         {
@@ -277,7 +280,8 @@ public class Weapon : MonoBehaviour
         }
     }
 
-    public bool CurrentWallPenetration {
+    public bool CurrentWallPenetration
+    {
         get => currentWallPenetration;
         set
         {
@@ -285,13 +289,16 @@ public class Weapon : MonoBehaviour
         }
     }
 
-    public bool CurrentHoming {
+    public bool CurrentHoming
+    {
         get => currentHoming;
         set
         {
             currentHoming = value;
         }
     }
+
+   
 
     //Drone stats
 
@@ -314,18 +321,18 @@ public class Weapon : MonoBehaviour
     //public float baseDroneVerticalSpeed;
     //private float currentDroneVerticalSpeed;
 
-    // Start is called before the first frame update
     void Start()
     {
+        currentBullet = bullet.GetComponent<Bullet>();
         UpdateAllWeaponStats();
-        
+        weapon.ammo = currentBullet.gameObject;
     }
 
     // Update is called once per frame
     void Update()
     {
         fireRateTimer -= Time.deltaTime;
-        if(Input.GetKey(KeyCode.Space) && fireRateTimer<=0)
+        if(Input.GetKey(KeyCode.Space) && fireRateTimer <=0)
         {
             Shoot();
             fireRateTimer = fireRate;
@@ -357,32 +364,29 @@ public class Weapon : MonoBehaviour
 
         if(Input.GetKeyDown(KeyCode.A))
         {
-            CurrentBulletConeAngle = -10;
-            Debug.Log(CurrentBulletConeAngle);
+            
         }
     }
 
     public void Shoot()
     {
 
-        for (int i=0;i<CurrentShotsAmmount;i++)
+        for (int i=0;i< currentShotsAmmount; i++)
         {
-            for(int j=0;j<CurrentBulletsPerShot;j++)
+            for(int j=0;j< currentBulletsPerShot; j++)
             {
-                GameObject bullet = Instantiate(ammo, shotsPositions[i].transform.position, Quaternion.identity);
+                GameObject bullet = Instantiate(weapon.ammo, shotsPositions[i].transform.position, Quaternion.identity);
                 Quaternion.FromToRotation(Vector3.right, shotsDirection);
                 bullet.transform.right = shotsDirection;
-               
                 float baseDeviation = 0;
-                if (CurrentBulletsPerShot>1)
+                if (currentBulletsPerShot > 1)
                 {
-                     baseDeviation = j * CurrentBulletConeAngle / (CurrentBulletsPerShot - 1) - (CurrentBulletConeAngle / 2.0f);
+                     baseDeviation = j * currentBulletConeAngle / (currentBulletsPerShot - 1) - (currentBulletConeAngle / 2.0f);
                 }
-                float spreadValue = Random.Range(-CurrentShotsSpreadAngle,CurrentShotsSpreadAngle);
+                float spreadValue = UnityEngine.Random.Range(-currentShotsSpreadAngle, currentShotsSpreadAngle);
                 float rotationAngle = baseDeviation + spreadValue;
                 bullet.transform.RotateAround(shotsPositions[i].transform.position, Vector3.forward,rotationAngle);
-                Bullet currentBullet = bullet.GetComponent<Bullet>();
-                currentBullet.speed = CurrentShotsSpeed;
+                UpdateBulletStats(bullet.GetComponent<Bullet>());
             }
         }
 
@@ -392,27 +396,53 @@ public class Weapon : MonoBehaviour
         //}
     }
 
+    private void UpdateBulletStats(Bullet b)
+    {
+        //Debug.Log(currentBulletSpeed);
+        b.speed = currentBulletSpeed;
+        b.speedDecrease = CurrentSpeedDecrease;
+        b.size = currentBulletSize;
+        b.damage = currentDamage * currentDamageMultiplier;
+        b.fireDamage = currentFireDamage * currentDamageMultiplier;
+        b.poisonDamage = currentPoisonDamage * currentDamageMultiplier;
+        b.iceDamage = currentIceDamage * currentDamageMultiplier;
+        b.shockDamage = currentShockDamage * currentDamageMultiplier;
+        b.horizontalSpeed = currentHorizontalSpeed;
+        b.verticalSpeed = currentVerticalSpeed;
+        b.explosionRadius = currentExplosionRadius;
+        b.gravityScale = currentGravityScale;
+        b.enemyPenetration = currentEnemyPenetration;
+        b.goesThroughWalls = currentWallPenetration;
+        b.homingBullet = currentHoming;        Debug.Log(currentSpeedDecrease);
+
+    }
+
     public void UpdateAllWeaponStats()
     {
-       currentShotsPerSeconds = baseShotsPerSeconds;
-       fireRate = 1.0f / currentShotsPerSeconds;
-       CurrentBulletsPerShot =baseBulletsPerShot; 
-       CurrentBulletConeAngle = baseBulletConeAngle; 
-       CurrentShotsSpreadAngle=baseShotsSpreadAngle; 
-       CurrentShotsAmmount=baseShotsAmmount;       
-       CurrentShotsSpeed=baseShotsSpeed;      
-       CurrentDamageMultiplier=baseDamageMultiplier;       
-       CurrentBulletSize=baseBulletSize;       
-       CurrentFireDamage=baseFireDamage;      
-       CurrentPoisonDamage=basePoisonDamage;       
-       CurrentIceDamage=baseIceDamage;       
-       CurrentShockDamage=baseShockDamage;       
-       CurrentHorizontalSpeed=baseHorizontalSpeed;
-       CurrentVerticalSpeed=baseVerticalSpeed;      
-       CurrentExplosionRadius=baseExplosionRadius;       
-       CurrentGravityScale=baseGravityScale;      
-       CurrentEnemyPenetration=baseEnemyPenetration;    
-       CurrentWallPenetration=baseWallPenetration;       
-       CurrentHoming = baseHoming;     
+        currentShotsPerSeconds = weapon.baseShotsPerSeconds;
+        fireRate = 1.0f / currentShotsPerSeconds;
+        currentBulletsPerShot = weapon.baseBulletsPerShot; 
+        currentBulletConeAngle = weapon.baseBulletConeAngle; 
+        currentShotsSpreadAngle = weapon.baseShotsSpreadAngle; 
+        currentShotsAmmount = weapon.baseShotsAmmount;
+        currentDamageMultiplier = weapon.baseDamageMultiplier;
+
+
+
+        currentBulletSpeed = currentBullet.baseBullet.baseSpeed;
+        currentSpeedDecrease = currentBullet.baseBullet.baseSpeedDecrease;
+        currentBulletSize = currentBullet.baseBullet.baseSize;
+        currentDamage = currentBullet.baseBullet.baseDamage;
+        currentFireDamage = currentBullet.baseBullet.baseFireDamage;      
+        currentPoisonDamage = currentBullet.baseBullet.basePoisonDamage;       
+        currentIceDamage = currentBullet.baseBullet.baseIceDamage;       
+        currentShockDamage = currentBullet.baseBullet.baseShockDamage;       
+        currentHorizontalSpeed = currentBullet.baseBullet.baseHorizontalSpeed;
+        currentVerticalSpeed = currentBullet.baseBullet.baseVerticalSpeed;      
+        currentExplosionRadius = currentBullet.baseBullet.baseExplosionRadius;       
+        currentGravityScale = currentBullet.baseBullet.baseGravityScale;      
+        currentEnemyPenetration = currentBullet.baseBullet.baseEnemyPenetration;    
+        currentWallPenetration = currentBullet.baseBullet.baseWallPenetration;       
+        currentHoming = currentBullet.baseBullet.baseHoming;
     }
  }     
