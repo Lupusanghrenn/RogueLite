@@ -6,29 +6,50 @@ public class Bullet : MonoBehaviour
 {
     public ScriptableBullet baseBullet;
 
-    public float speed;
-    public float speedDecrease;
-    public float size;
-    public float damage;
+    private float speed;
+    private float speedDecrease;
+    private float size;
+    private float damage;
+    
+    private float explosionRadius;
+    private float gravityScale;
+    private float enemyPenetration;
+    
+    private float fireDamage;
+    private float poisonDamage;
+    private float iceDamage;
+    private float shockDamage;
+    
+    private bool goesThroughWalls;
+    private bool homingBullet;
 
-    public float explosionRadius;
-    public float gravityScale;
-    public float enemyPenetration;
+    private float horizontalFrequence;
+    private float verticalFrequence;
+    private float horizontalAmplitude;
+    private float verticalAmplitude;
 
-    public float fireDamage;
-    public float poisonDamage;
-    public float iceDamage;
-    public float shockDamage;
-
-    public bool goesThroughWalls;
-    public bool homingBullet;
-
-    public float horizontalSpeed;
-    public float verticalSpeed;
     private Vector3 horizontalMouvement;
     private Vector3 verticalMouvement;
     private float horizontalTimer = 0;
     private float verticalTimer = 0;
+
+    public float Speed { get => speed; set => speed = value; }
+    public float SpeedDecrease { get => speedDecrease; set => speedDecrease = value; }
+    public float Size { get => size; set => size = value; }
+    public float Damage { get => damage; set => damage = value; }
+    public float ExplosionRadius { get => explosionRadius; set => explosionRadius = value; }
+    public float GravityScale { get => gravityScale; set => gravityScale = value; }
+    public float EnemyPenetration { get => enemyPenetration; set => enemyPenetration = value; }
+    public float FireDamage { get => fireDamage; set => fireDamage = value; }
+    public float PoisonDamage { get => poisonDamage; set => poisonDamage = value; }
+    public float IceDamage { get => iceDamage; set => iceDamage = value; }
+    public float ShockDamage { get => shockDamage; set => shockDamage = value; }
+    public bool GoesThroughWalls { get => goesThroughWalls; set => goesThroughWalls = value; }
+    public bool HomingBullet { get => homingBullet; set => homingBullet = value; }
+    public float HorizontalFrequence { get => horizontalFrequence; set => horizontalFrequence = value; }
+    public float VerticalFrequence { get => verticalFrequence; set => verticalFrequence = value; }
+    public float HorizontalAmplitude { get => horizontalAmplitude; set => horizontalAmplitude = value; }
+    public float VerticalAmplitude { get => verticalAmplitude; set => verticalAmplitude = value; }
 
 
 
@@ -46,13 +67,13 @@ public class Bullet : MonoBehaviour
 
     private void FixedUpdate()
     {
-        horizontalTimer += horizontalSpeed * Time.deltaTime;
-        verticalTimer += verticalSpeed * Time.deltaTime;
-        horizontalMouvement =  transform.up * Mathf.Cos(horizontalTimer)*0.05f;
-        verticalMouvement =  transform.right * Mathf.Sin(verticalTimer)*0.05f;
+        horizontalTimer += HorizontalFrequence * Time.deltaTime;
+        verticalTimer += VerticalFrequence * Time.deltaTime;
+        horizontalMouvement =  transform.up * Mathf.Sin(horizontalTimer) * HorizontalAmplitude;
+        verticalMouvement =  transform.right * Mathf.Sin(verticalTimer) * VerticalAmplitude;
 
 
-        transform.position += verticalMouvement+horizontalMouvement + (transform.right * speed) * Time.fixedDeltaTime;
-        speed *= speedDecrease;
+        transform.position += verticalMouvement+horizontalMouvement + (transform.right * Speed) * Time.fixedDeltaTime;
+        Speed *= SpeedDecrease;
     }
 }

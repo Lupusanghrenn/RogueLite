@@ -30,18 +30,27 @@ public class Weapon : MonoBehaviour
 
     private float currentBulletSpeed;
     private float currentSpeedDecrease;
-    private float currentDamage;
+
     private float currentBulletSize;
+
+    private float currentDamage;
     private float currentFireDamage;
     private float currentPoisonDamage;
     private float currentIceDamage;
     private float currentShockDamage;
-    private float currentHorizontalSpeed;
-    private float currentVerticalSpeed;
+
+    private float currentHorizontalFrequence;
+    private float currentVerticalFrequence;
+    private float currentHorizontalAmplitude;
+    private float currentVerticalAmplitude;
+
     private float currentExplosionRadius;
+
     private float currentGravityScale;
+
     private float currentEnemyPenetration;
     private bool currentWallPenetration;
+
     private bool currentHoming;
 
 
@@ -215,28 +224,54 @@ public class Weapon : MonoBehaviour
         }
     }
 
-    public float CurrentHorizontalSpeed
+    public float CurrentHorizontalFrequence
     {
-        get => currentHorizontalSpeed;
+        get => currentHorizontalFrequence;
         set
         {
-            currentHorizontalSpeed += value;
-            if (currentHorizontalSpeed <= 0)
+            currentHorizontalFrequence += value;
+            if (currentHorizontalFrequence <= 0)
             {
-                currentHorizontalSpeed = 0;
+                currentHorizontalFrequence = 0;
             }
         }
     }
 
-    public float CurrentVerticalSpeed
+    public float CurrentVerticalFrequence
     {
-        get => currentVerticalSpeed;
+        get => currentVerticalFrequence;
         set
         {
-            currentVerticalSpeed += value;
-            if (currentVerticalSpeed <= 0)
+            currentVerticalFrequence += value;
+            if (currentVerticalFrequence <= 0)
             {
-                currentVerticalSpeed = 0;
+                currentVerticalFrequence = 0;
+            }
+        }
+    }
+
+    public float CurrentHorizontalAmplitude
+    {
+        get => currentHorizontalAmplitude;
+        set
+        {
+            currentHorizontalAmplitude += value;
+            if (currentHorizontalAmplitude <= 0)
+            {
+                currentHorizontalAmplitude = 0;
+            }
+        }
+    }
+
+    public float CurrentVerticalAmplitude
+    {
+        get => currentVerticalAmplitude;
+        set
+        {
+            currentVerticalAmplitude += value;
+            if (currentVerticalAmplitude <= 0)
+            {
+                currentVerticalAmplitude = 0;
             }
         }
     }
@@ -298,7 +333,9 @@ public class Weapon : MonoBehaviour
         }
     }
 
-   
+
+
+
 
     //Drone stats
 
@@ -399,22 +436,23 @@ public class Weapon : MonoBehaviour
     private void UpdateBulletStats(Bullet b)
     {
         //Debug.Log(currentBulletSpeed);
-        b.speed = currentBulletSpeed;
-        b.speedDecrease = CurrentSpeedDecrease;
-        b.size = currentBulletSize;
-        b.damage = currentDamage * currentDamageMultiplier;
-        b.fireDamage = currentFireDamage * currentDamageMultiplier;
-        b.poisonDamage = currentPoisonDamage * currentDamageMultiplier;
-        b.iceDamage = currentIceDamage * currentDamageMultiplier;
-        b.shockDamage = currentShockDamage * currentDamageMultiplier;
-        b.horizontalSpeed = currentHorizontalSpeed;
-        b.verticalSpeed = currentVerticalSpeed;
-        b.explosionRadius = currentExplosionRadius;
-        b.gravityScale = currentGravityScale;
-        b.enemyPenetration = currentEnemyPenetration;
-        b.goesThroughWalls = currentWallPenetration;
-        b.homingBullet = currentHoming;        Debug.Log(currentSpeedDecrease);
-
+        b.Speed = currentBulletSpeed;
+        b.SpeedDecrease = CurrentSpeedDecrease;
+        b.Size = currentBulletSize;
+        b.Damage = currentDamage * currentDamageMultiplier;
+        b.FireDamage = currentFireDamage * currentDamageMultiplier;
+        b.PoisonDamage = currentPoisonDamage * currentDamageMultiplier;
+        b.IceDamage = currentIceDamage * currentDamageMultiplier;
+        b.ShockDamage = currentShockDamage * currentDamageMultiplier;
+        b.HorizontalFrequence = currentHorizontalFrequence;
+        b.VerticalFrequence = currentVerticalFrequence;
+        b.HorizontalAmplitude = currentHorizontalAmplitude;
+        b.VerticalAmplitude = currentVerticalAmplitude;
+        b.ExplosionRadius = currentExplosionRadius;
+        b.GravityScale = currentGravityScale;
+        b.EnemyPenetration = currentEnemyPenetration;
+        b.GoesThroughWalls = currentWallPenetration;
+        b.HomingBullet = currentHoming;
     }
 
     public void UpdateAllWeaponStats()
@@ -427,8 +465,6 @@ public class Weapon : MonoBehaviour
         currentShotsAmmount = weapon.baseShotsAmmount;
         currentDamageMultiplier = weapon.baseDamageMultiplier;
 
-
-
         currentBulletSpeed = currentBullet.baseBullet.baseSpeed;
         currentSpeedDecrease = currentBullet.baseBullet.baseSpeedDecrease;
         currentBulletSize = currentBullet.baseBullet.baseSize;
@@ -436,9 +472,11 @@ public class Weapon : MonoBehaviour
         currentFireDamage = currentBullet.baseBullet.baseFireDamage;      
         currentPoisonDamage = currentBullet.baseBullet.basePoisonDamage;       
         currentIceDamage = currentBullet.baseBullet.baseIceDamage;       
-        currentShockDamage = currentBullet.baseBullet.baseShockDamage;       
-        currentHorizontalSpeed = currentBullet.baseBullet.baseHorizontalSpeed;
-        currentVerticalSpeed = currentBullet.baseBullet.baseVerticalSpeed;      
+        currentShockDamage = currentBullet.baseBullet.baseShockDamage;
+        currentHorizontalFrequence = currentBullet.baseBullet.baseHorizontalFrequence;
+        currentVerticalFrequence = currentBullet.baseBullet.baseVerticalFrequence;
+        currentHorizontalAmplitude = currentBullet.baseBullet.baseHorizontalAmplitude;
+        currentVerticalAmplitude = currentBullet.baseBullet.baseVerticalAmplitude;
         currentExplosionRadius = currentBullet.baseBullet.baseExplosionRadius;       
         currentGravityScale = currentBullet.baseBullet.baseGravityScale;      
         currentEnemyPenetration = currentBullet.baseBullet.baseEnemyPenetration;    

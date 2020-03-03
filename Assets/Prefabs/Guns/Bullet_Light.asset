@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dda868b192174ff49b662be891290699, type: 3}
   m_Name: Bullet_Light
   m_EditorClassIdentifier: 
-  baseSpeed: 2
+  baseSpeed: 0
   baseSpeedDecrease: 1
   baseSize: 1
   baseDamage: 1
@@ -20,8 +20,10 @@ MonoBehaviour:
   basePoisonDamage: 0
   baseIceDamage: 0
   baseShockDamage: 0
-  baseHorizontalSpeed: 20
-  baseVerticalSpeed: 20
+  baseHorizontalFrequence: 0
+  baseVerticalFrequence: 5
+  baseHorizontalAmplitude: 0
+  baseVerticalAmplitude: 0.5
   baseExplosionRadius: 0
   baseGravityScale: 0
   baseEnemyPenetration: 0
