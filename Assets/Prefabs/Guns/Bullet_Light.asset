@@ -29,3 +29,4 @@ MonoBehaviour:
   baseEnemyPenetration: 0
   baseWallPenetration: 0
   baseHoming: 0
+  baseTimeBeforeDestruction: 3

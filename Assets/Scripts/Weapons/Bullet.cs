@@ -30,8 +30,11 @@ public class Bullet : MonoBehaviour
 
     private Vector3 horizontalMouvement;
     private Vector3 verticalMouvement;
-    private float horizontalTimer = 0;
-    private float verticalTimer = 0;
+    private float horizontalTimer;
+    private float verticalTimer;
+
+    private float timeBeforeDestruction = 1;
+    private float destructionTimer;
 
     public float Speed { get => speed; set => speed = value; }
     public float SpeedDecrease { get => speedDecrease; set => speedDecrease = value; }
@@ -50,19 +53,24 @@ public class Bullet : MonoBehaviour
     public float VerticalFrequence { get => verticalFrequence; set => verticalFrequence = value; }
     public float HorizontalAmplitude { get => horizontalAmplitude; set => horizontalAmplitude = value; }
     public float VerticalAmplitude { get => verticalAmplitude; set => verticalAmplitude = value; }
+    public float TimeBeforeDestruction { get => timeBeforeDestruction; set => timeBeforeDestruction = value; }
 
 
 
     // Start is called before the first frame update
     void Start()
     {
-        
+        destructionTimer = timeBeforeDestruction;
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        destructionTimer -= Time.deltaTime;
+        if(destructionTimer<=0)
+        {
+            Destroy(gameObject);
+        }
     }
 
     private void FixedUpdate()

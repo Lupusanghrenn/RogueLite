@@ -53,6 +53,8 @@ public class Weapon : MonoBehaviour
 
     private bool currentHoming;
 
+    private float currentTimeBeforeDestruction;
+
 
     public float CurrentShotsPerSeconds
     {
@@ -333,6 +335,19 @@ public class Weapon : MonoBehaviour
         }
     }
 
+    public float CurrentTimeBeforeDestruction 
+    { 
+        get => currentTimeBeforeDestruction;
+        set
+        {
+            currentTimeBeforeDestruction += value;
+            if (currentTimeBeforeDestruction < 1.0f)
+            {
+                currentTimeBeforeDestruction = 1.0f;
+            }
+        }
+    }
+
 
 
 
@@ -453,6 +468,7 @@ public class Weapon : MonoBehaviour
         b.EnemyPenetration = currentEnemyPenetration;
         b.GoesThroughWalls = currentWallPenetration;
         b.HomingBullet = currentHoming;
+        b.TimeBeforeDestruction = currentTimeBeforeDestruction;
     }
 
     public void UpdateAllWeaponStats()
@@ -482,5 +498,6 @@ public class Weapon : MonoBehaviour
         currentEnemyPenetration = currentBullet.baseBullet.baseEnemyPenetration;    
         currentWallPenetration = currentBullet.baseBullet.baseWallPenetration;       
         currentHoming = currentBullet.baseBullet.baseHoming;
+        CurrentTimeBeforeDestruction = currentBullet.baseBullet.baseTimeBeforeDestruction;
     }
  }     

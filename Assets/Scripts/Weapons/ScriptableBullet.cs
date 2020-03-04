@@ -31,5 +31,7 @@ public class ScriptableBullet : ScriptableObject
     public float baseEnemyPenetration;
     public bool baseWallPenetration;
 
-    public bool baseHoming;   
+    public bool baseHoming;
+
+    public float baseTimeBeforeDestruction;
 }
